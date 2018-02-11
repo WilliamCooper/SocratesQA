@@ -1,0 +1,2589 @@
+%% LyX 2.2.3 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[12pt,twoside,english]{article}
+\usepackage{mathptmx}
+\usepackage[T1]{fontenc}
+\usepackage[letterpaper]{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1.2in,rmargin=1in,headheight=1cm,headsep=2cm,footskip=0.5cm}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setcounter{secnumdepth}{2}
+\setcounter{tocdepth}{2}
+\setlength{\parskip}{\medskipamount}
+\setlength{\parindent}{0pt}
+\usepackage{color}
+\usepackage{babel}
+\usepackage{array}
+\usepackage{verbatim}
+\usepackage[authoryear]{natbib}
+\usepackage[unicode=true]
+ {hyperref}
+\usepackage{breakurl}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+\newcommand{\lyxaddress}[1]{
+\par {\raggedright #1
+\vspace{1.4em}
+\noindent\par}
+}
+\newenvironment{lyxlist}[1]
+{\begin{list}{}
+{\settowidth{\labelwidth}{#1}
+ \setlength{\leftmargin}{\labelwidth}
+ \addtolength{\leftmargin}{\labelsep}
+ \renewcommand{\makelabel}[1]{##1\hfil}}}
+{\end{list}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\input colordvi
+\usepackage{color}
+%\fancyhead{}
+%\fancyfoot[CE,CO]{}
+\newtoks{\topicofnote} \global\topicofnote={}
+\newdimen\longindent \longindent=3.5truein
+%\fancyhead[L]{Aircraft Algorithm Memo re: \the\topicofnote \\ \datetoday \\ Page \thepage \hfill}
+\renewcommand{\headrulewidth}{0.0pt}
+\newenvironment{lyxlst}[1]
+{\begin{list}{}
+{\settowidth{\labelwidth}{#1}
+\setlength{\leftmargin}{\labelwidth}
+\addtolength{\leftmargin}{\labelsep}
+\renewcommand{\makelabel}[1]{##1\hfil}}}
+{\end{list}}
+\newcommand{\datetoday}{\number\day\space
+     \ifcase\month\or January\or February\or March\or April\or May\or
+     June\or July\or August\or September\or October\or November\or
+     December\fi
+     \space\number\year}
+\newcommand{\RAFAlgorithmMemo}{\null \vskip-1.5truein
+{\raggedright \textsf{\textsc{\large \textcolor{blue}{Research Aviation Facility}}}}\par
+{\raggedright \textsf{\textsl{\textcolor{blue}{Algorithm Memorandum:}}}} \par \vskip6pt
+{\color{blue}{\hrule}}\par
+\vskip0.2truein\leftline{\textcolor{blue}{\textsf{Subject: \the\topicofnote}}}
+\leftline{\textcolor{blue}{\textsf{Al Cooper}}}
+\leftline{\textcolor{blue}{\textsf{\datetoday}}} \vskip0.2truein
+\thispagestyle{empty}}
+\newcommand{\attachm}[1]{\begin{lyxlst}{Attachments:00}
+\item [Attachments:] {#1}
+\end{lyxlst}}
+\newcommand{\cc}[1]{\begin{lyxlst}{Attachments:00}
+\item [cc:] {#1}
+\end{lyxlst}}
+\newcommand{\attach}[1]{\begin{lyxlst}{Attachments:00}
+\item [Attachment:] {#1}
+\end{lyxlst}}
+%usage: \encl{A\\B\\C} or \cc{ma,e1\\name2\\name3}
+
+\makeatother
+
+\begin{document}
+
+\title{\textbf{Wind Measurements in SOCRATES:}\\
+An Evaluation of the Pitot-Static Sensor\\
+and the Gust Pod \\
+\textcolor{black}{\large{}with suggested processing algorithms}}
+
+\author{Al Cooper}
+
+\date{\datetoday}
+\maketitle
+
+\lyxaddress{National Center for Atmospheric Research\\
+Earth Observing Laboratory\\
+Research Aviation Facility\\
+cooperw@ucar.edu}
+
+\vfill{}
+\cleardoublepage{} \pagenumbering{roman}
+
+\renewcommand{\contentsname}{Table of Contents} \tableofcontents{}
+\vfill{}
+\eject
+
+\renewcommand{\abstractname}{Abstract}\thispagestyle{plain}\begin{abstract}
+
+This documents discusses some of the options for measuring wind in
+SOCRATES. The NSF/NCAR GV has some new capabilities that might improve
+the measurements of wind, but they are not fully investigated and
+documented yet and in some cases the processing algorithms have not
+be developed. This report describes some studies of the new measurements
+and recommends new procedures and processing algorithms for the calculation
+of wind. The result is evidence that the new pitot-static sensor provides
+a much improved measurement of airspeed but still has some residual
+noise at frequencies above about 5~Hz. The gust pod as processed
+here provides valid measurements of the wind that are consistent with
+the standard system and so could serve as back-up measurements to
+that system. However, the variance spectra from the gust pod have
+several suspicious traits and should not be used for spectral analysis
+without further study. An additional result documented here is that
+the corrections now applied to measurements of ambient and dynamic
+pressure, developed in 2014, remain valid and do not need revision.
+
+\end{abstract}
+
+\cleardoublepage{}
+
+\begin{comment}
+set topicofnote to topic of note
+\end{comment}
+
+\pagenumbering{arabic}
+
+\section{Introduction}
+
+\subsection{General scope of this report}
+
+The NCAR Technical Note on ``Characterization of Uncertainty in Measurements
+of Wind from the NSF/NCAR GV'' (\citet{Cooper2016ncartn}) includes
+an extensive discussion of the wind-measuring capabilities of the
+GV, and a journal article (\citet{CooperEtAl2014}) documented how
+a laser air-motion sensor can be used to improve those measurements.
+In addition, a recent technical note (\citet{Cooper2017ncartn}) presented
+an approach to improving the measurements through use of a Kalman
+filter. In most regards, these studies concluded that the wind measurement
+from the GV has low uncertainty limits and meets most needs of research
+projects. However, one aspect has remained troublesome: The variance
+spectra of the measurements, especially of the longitudinal component
+of the wind, show unacceptable noise. This is documented in the 2016
+NCAR Technical Note referenced above, in an appendix that discusses
+the high-frequency measurements (titled ``Turbulence''). Plots in
+this discussion, taken from a suggestion and analysis by Don Lenschow,
+indicate that the problem is resonance noise in the long lines used
+to connect pressure sensors to the relevant ports.
+
+In response, RAF has installed a new pitot-static sensor for the measurement
+of the airspeed. That instrument uses much shorter lines, so it is
+hoped that it will reduce the noise. In addition, the gust pod is
+being flown in SOCRATES as another candidate for making high-frequency
+measurements, because its lines are still shorter. The gust-pod five-hole
+probe itself is only about an inch in diameter, so it may provide
+the best high-frequency measurements. Although the sensor was used
+before in the DEEPWAVE project and provided good measurements, as
+documented in the 2016 technical note, it is flown in a new configuration
+in SOCRATES that includes the large pods under the wings. These were
+not present in DEEPWAVE and apparently change the distortion of airflow
+approaching the gust pod to such a degree that the processing developed
+for DEEPWAVE does not work in SOCRATES.
+
+One additional source of information about the wind-sensing system
+is the ARISTO-2017 experiment, in which the Laser Air-Motion Sensor
+(LAMS) was flown on the GV\@. This provides an opportunity to check
+and possibly update the airspeed calibration reported in the 2014
+paper. The large pods were present in ARISTO-2017, so if there is
+any effect on the standard system it should be possible to detect
+it by using these new measurements.
+
+This report is organized into the following major sections:
+\begin{itemize}
+\item Section 2 discusses the ARISTO-2017 flights and the use of LAMS to
+check the measurement of airspeed. 
+\item Section 3 discusses the new pitot-static sensor and proposes a way
+to use its measurement for the calculation of wind. 
+\item Section 4 develops a new approach to processing the data from the
+gust pod and shows results from that instrument.
+\item Section 5 then examines the high-rate measurements available from
+the standard system, the standard system modified to use the pitot-static
+sensor, and the gust-pod system.
+\end{itemize}
+The ``Summary'' section then discusses proposed ways to process
+the data, the relative merits of the two new options, and the general
+status of wind measurements a high rate. Suggested processing schemes
+are summarized there for possible use in SOCRATES\@. Those processing
+schemes have been incorporated into the ``QAtools'' shiny app (see
+\href{https://drive.google.com/open?id=0B1kIUH45ca5AN3VXSnlMOHFWS28}{this URL})
+so that tests can be made during and after the field campaign by adding
+new processed variables to copies of the netCDF files. With appropriate
+revision, what is proposed can be incorporated into standard processing
+(in ``nimbus''), but the second-pass processing may be a better
+way to add these variables in the short term.
+
+The present text document and the data processing are incorporated
+into a single file, named ``WindInSOCRATES.Rnw'', located in the
+EOL directory \textasciitilde{}cooperw/RStudio/SocratesQA/ . A ``Reproducibility''
+Appendix discusses how this work could be duplicated, and all the
+needed components are archived in a GitHub directory, as discussed
+in that Appendix.
+
+\subsection{Comments related to the standard radome-based system\label{subsec:AKRDcompF}}
+
+The approach to the gust-pod will be to match the results from the
+radome system, so that system is revisited here first. A script produced
+earlier for ORCAS, AKRD.Rnw, implemented second-pass processing for
+AKRD using a complementary-filter approach and developed appropriate
+coefficients and formulas. A memo at \href{https://drive.google.com/open?id=0B1kIUH45ca5AaFg4Sk9UWDY5OFE}{this URL}\footnote{Here and elsewhere in this document, references like ``this URL''
+are live links to the appropriate documents.} documents those results, and a presentation made in support of this
+approach is available at this URL\href{https://drive.google.com/open?id=0B1kIUH45ca5ALXktNklmdkl3bFU}{at this URL}.
+Because implementation of that approach is still pending, some of
+the information is repeated here. In addition, data from early SOCRATES
+flights are added to the data set used previously to test that the
+results are appropriate for SOCRATES. (It will be useful to repeat
+this analysis with additional SOCRATES flights when they become available.)
+
+For reference, the ``standard'' representation in use for several
+years has been
+
+\[
+\alpha=c_{0}+\frac{\Delta p_{\alpha}}{q}\left(c_{1}+c_{2}M\right)
+\]
+and the coefficients were found by fitting that formula to a reference
+that assumes there is zero vertical wind:\\
+\[
+\alpha^{*}=\theta-\frac{w_{p}}{V}
+\]
+
+The justification for this form is that studies of five-hole pressure
+sensors have found a Mach-number dependence that affects their sensitivity. 
+
+Here the approach will be different. The reference value is split
+into two components, $\alpha^{*}=\alpha_{f}^{*}+\alpha_{s}^{*}$ that
+result from applying a Butterworth low-pass filter to $\alpha^{*}$
+(in the code, the variable AOAREF) to obtain $\alpha_{s}^{*}$ and
+then finding $\alpha_{f}^{*}$from $\alpha_{f}^{*}=\alpha^{*}-\alpha_{s}^{*}$.
+These components are then represented by separate fits:
+
+\begin{equation}
+\alpha_{f}=\left(\frac{\mathrm{\{ADIFR\}}}{\mathrm{\{QCF\}}}\right)_{f}(c_{1}+c_{2}M)\label{eq:alpha-fast}
+\end{equation}
+\begin{equation}
+\alpha_{s}=d_{0}+d_{1}\left(\frac{\mathrm{\{ADIFR\}}}{\mathrm{\{QCF\}}}\right)_{s}+d_{2}\mathrm{\{QCF\}}_{s}\label{eq:alpha-slow}
+\end{equation}
+where the $f$ and $s$ subscripts represent the high-pass and low-pass
+components after filtering. More complicated representations were
+tested in both cases, but these appear to provide adequate fits without
+additional terms. The $c_{2}$ term representing Mach-number dependence
+does not appear to be necessary, but the expectation that there will
+be some dependence on $M$ justified its tentative inclusion. However,
+the fits below show no significant difference with $c_{2}=0$, and
+an analysis of variance made its inclusion appear questionable, so
+it has been dropped from the calculations presented here.
+
+This approach has two advantages:
+\begin{enumerate}
+\item The important sensitivity to fluctuations is not compromised by efforts
+to represent the slowly varying zero level for angle of attack.
+\item The slowly varying zero reference can be represented by more complex
+equations without needing to apply those to the high-frequency component.
+\end{enumerate}
+The result is an empirical representation that is appropriate for
+all recent GV projects and that does not need to be changed for each
+project, as has been the case for many recent projects that use the
+standard representation. Readers may prefer to jump to Section~\ref{sec:Measurements-from-LAMS}
+and skip the details of how this representation was developed because
+this information has been presented before at the Research Aviation
+Facility. The rest of this subsection is only a minor update to the
+previous study that uses some of the measurements from SOCRATES.
+
+\subsubsection{Data used in the fit}
+
+The selection of data was described in the previous memo, but that
+information will be repeated here with the addition of SOCRATES data.
+The first step is to assemble the data to be used for fitting. The
+data set should include as many flights and projects as is reasonable,
+but should be reviewed also to eliminate flights that appear anomalous
+because of problems with the measurements, strong updrafts and downdrafts,
+special loading conditions, or other aspects of the flights that make
+them questionable to include.
+
+In this case, measurements from ORCAS, CSET, DEEPWAVE and early SOCRATES
+were used. For CSET, the selected flights were 1, 2, 3, 4, 6, 10,
+12, and 16. For ORCAS, flights 1, 2, 3, 6, 8, 9, 11, 14, and 16 were
+selected. For DEEPWAVE, all 26 flights were used excepting 6, 7, 15,
+and 23. For SOCRATES, test flight 1 is particularly useful to include
+because it includes the only maneuvers to data. Research flights 1
+and 2 are the only ones available to data and are needed to emphasize
+the low-level flight segments that are important conditions for the
+measurement of wind, but for now they have been excluded because the
+vertical-wind variance spectra suggest some problem with ADIFR\@.
+To use different flights in the future, changes to the 'Project' statements
+and 'best' statements will be needed, and in addition it will be necessary
+to change the logical variables 'NewCoefficients' and 'ReloadData'
+to TRUE. Otherwise, this program skips recalculation of the coefficients
+and just retrieves them from the file './AKRD-fit-coef.Rdata' where
+they have been stored by a previous run. The process of constructing
+the data.frame used in the fit, not necessary if those previously
+determined coefficients are to be used, was as follows:
+\begin{enumerate}
+\item Read the netCDF file as on /scr/raf\_data/\{Project\}, for each flight
+in CSET and ORCAS (not just the ones listed above).\footnote{For ORCAS flight 12, the available netCDF file was bad and couldn't
+be read, so that flight was skipped.} 
+\item For each file, add appropriate variables for fitting (QR=ADIFR/QCF,
+M=Mach number using uncorrected pressures, AOAREF=PITCH-(GGVSPD/TASF){*}180/$\pi$,
+QCF) and the low-pass and high-pass components of these produced by
+a Butterworth third-order filter with cutoff frequency of 1/600 Hz.
+A version of the filter was used that made two passes, one forward
+and one backward, through the data and combined the results. Some
+exploration of values for the cutoff frequency led to similar results
+over a wide range from 0.01~Hz to 0.001~Hz, but the choice (1/600)~Hz
+appeared to be a good compromise between the conflicting requirements
+to represent the low-pass component well without having it distort
+the high-pass response.
+\item The file was truncated to include only data spanning from the first
+measurement of airspeed above 90~m/s to the last, to avoid periods
+when the aircraft was still on the ground or just after take-off.
+\item A variable representing flight number was added to each file. To avoid
+ambiguity among projects, ORCAS flights were assigned numbers equal
+to 100 plus the flight number. This variable, named RF, then made
+it possible to identify individual flights after all were concatenated.
+\item The individual flights were then concatenated into one data.frame
+containing only the variables needed for fitting and a few others
+used while examining the results. The variables in the data.frame
+were ADIFR, AKRD, GGALT, GGVSPD, PITCH, PSF, QCF, ROLL, SSLIP, TASF,
+TASX, THDG, WIC, and those added in step 2 above.
+\item From this data frame, another (called DF) was constructed to use in
+fitting. It consisted only of the 17 selected flights listed above.
+In addition, measurements spanning 600~s from the start and end of
+each file were removed to avoid periods where end-effects seemed to
+cause problems with the filtered results and also to avoid problematic
+periods during initial climb and final descent, which otherwise seemed
+to distort the fits.
+\item The final data.frame (DF) was then restricted to measurements with
+TASF > 110 and ROLL between -2 and 2$^{\circ}$, to avoid possible
+periods of slow flight or in turns. Turns in particular invalidate
+the fit assumption involved in finding the reference (AOAREF) used
+for the fit, so these need to be excluded or turns cause serious distortion
+of the results.
+\end{enumerate}
+<<initialization, include=FALSE>>=
+
+require(knitr)
+opts_chunk$set(fig.path='figure/SO-', echo=FALSE, include=FALSE, fig.lp="fig:", dev='png', dpi=100, fig.show='hold', size='footnotesize', replace.assign=TRUE, width=49)
+opts_chunk$set(fig.width=6, fig.height=5, fig.align="center", digits=4)
+options(digits=5)
+thisFileName <- "WindInSOCRATES"
+require(Ranadu, quietly = TRUE, warn.conflicts=FALSE)
+require(ggplot2)
+require(grid)
+require(ggthemes)
+require(zoo)
+library(scales)
+source('chunks/VSpec.R')  ## temporary, pending inclusion in Ranadu
+source('chunks/removeSpikes.R')
+source('chunks/DemingFit.R')    ## temporary, pending Ranadu update
+source('chunks/SplitDV.R')
+refline <- function (vmin=-100, vmax=100) {
+  lines(c(vmin, vmax), c(vmin, vmax), col='darkorange', lwd=2, lty=2)
+}
+ReviseProjects <- c('SOCRATES')  ## these are the projects to process 
+nP <- length (ReviseProjects)
+# ReviseProjects <- 'ORCAS'
+Directory <- DataDirectory ()			
+VarList <- c("ADIFR", "GGVSPD", "PITCH", "QCF", "PSF", "AKRD", "WIC", "TASF", "GGALT", "ROLL", "PSXC", "ATX", "QCXC")
+## add variables needed to recalculate wind
+VarList <- c(VarList, "TASX", "ATTACK", "SSLIP", "GGVEW", "GGVNS", "VEW", "VNS", "THDG")
+SaveRData <- sprintf("%s.Rdata", thisFileName)
+## this controls if new coefficients are calculated and associated plots made:
+NewCoefficients <- FALSE
+# NewCoefficients <- TRUE
+source('chunks/SummarizeFit.R')
+
+@
+
+<<construct-dataframe, eval=NewCoefficients>>=
+
+ReloadData <- FALSE  ## have old data for CSET, ORCAS, DEEPWAVE;
+## need new for SOCRATES; for now, do this in all cases
+# ReloadData <- TRUE
+Project <- "ORCAS"
+Data <- data.frame()
+if (ReloadData) {
+  for (flt in 1:19) {
+    if (flt == 12) {next}  ## file is bad
+    fname = sprintf("%s%s/%srf%02d.nc", Directory,Project,Project,flt)
+    fno <- flt
+    D <- getNetCDF (fname, VarList, F=fno)
+    D$QR <- D$ADIFR / D$QCF
+    D$QR[D$QCF < 20] <- NA
+    D$QR[is.infinite(D$QR)] <- NA
+    D$AOAREF <- (D$PITCH - (D$GGVSPD / D$TASF) * (180 / pi)) 
+    D$M <- MachNumber (D$PSF, D$QCF)
+    D$WICS <- SmoothInterp (D$WIC)
+    CutoffPeriod <- 600
+    Rate <- 1
+    D$AOAREFS <- zoo::na.approx (as.vector(D$AOAREF), maxgap=1000*Rate, na.rm = FALSE)
+    D$AOAREFS[is.na(D$AOAREFS)] <- 0
+    D$AOAREFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$AOAREFS)
+    D$AOAREFF <-  D$AOAREF - D$AOAREFS
+    D$QRS <- zoo::na.approx (as.vector(D$QR), maxgap=1000*Rate, na.rm = FALSE)
+    D$QRS[is.na(D$QRS)] <- 0
+    D$QRS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QRS)
+    D$QRF <-  D$QR - D$QRS
+    D$QCFS <- zoo::na.approx (as.vector(D$QCF), maxgap=1000*Rate, na.rm = FALSE)
+    D$QCFS[is.na(D$QCFS)] <- 0
+    D$QCFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QCFS)
+    D$MS <- zoo::na.approx (as.vector(D$M), maxgap=1000*Rate, na.rm = FALSE)
+    D$MS[is.na(D$MS)] <- 0
+    D$MS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$MS)
+    D$MF <-  D$M - D$MS
+    ## limit to times between first TASX > 90 and last TASX > 90:
+    TS <- D$Time[D$TASX > 90]
+    TS <- TS[!is.na(TS)]
+    B <- TS[1]; E <- TS[length(TS)]
+    D <- D[D$Time >= B & D$Time <= E,]
+    Data <- rbind (Data, D)
+  }
+  save(Data, file='AKRDforORCAS.Rdata')
+  Data$RF <- Data$RF + 100
+  Data1 <- Data
+  Data <- data.frame()
+  Project <- 'CSET'
+  for (flt in 1:16) {
+    fname = sprintf("%s%s/%srf%02d.nc", Directory,Project,Project,flt)
+    fno <- flt
+    D <- getNetCDF (fname, VarList, F=fno)
+    D$QR <- D$ADIFR / D$QCF
+    D$QR[D$QCF < 20] <- NA
+    D$QR[is.infinite(D$QR)] <- NA
+    D$AOAREF <- (D$PITCH - (D$GGVSPD / D$TASF) * (180 / pi)) 
+    D$M <- MachNumber (D$PSF, D$QCF)
+    D$WICS <- SmoothInterp (D$WIC)
+    CutoffPeriod <- 600
+    Rate <- 1
+    D$AOAREFS <- zoo::na.approx (as.vector(D$AOAREF), maxgap=1000*Rate, na.rm = FALSE)
+    D$AOAREFS[is.na(D$AOAREFS)] <- 0
+    D$AOAREFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$AOAREFS)
+    D$AOAREFF <-  D$AOAREF - D$AOAREFS
+    D$QRS <- zoo::na.approx (as.vector(D$QR), maxgap=1000*Rate, na.rm = FALSE)
+    D$QRS[is.na(D$QRS)] <- 0
+    D$QRS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QRS)
+    D$QRF <-  D$QR - D$QRS
+    D$QCFS <- zoo::na.approx (as.vector(D$QCF), maxgap=1000*Rate, na.rm = FALSE)
+    D$QCFS[is.na(D$QCFS)] <- 0
+    D$QCFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QCFS)
+    D$MS <- zoo::na.approx (as.vector(D$M), maxgap=1000*Rate, na.rm = FALSE)
+    D$MS[is.na(D$MS)] <- 0
+    D$MS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$MS)
+    D$MF <-  D$M - D$MS
+    ## limit to times between first TASX > 90 and last TASX > 90:
+    TS <- D$Time[D$TASX > 90]
+    TS <- TS[!is.na(TS)]
+    B <- TS[1]; E <- TS[length(TS)]
+    D <- D[D$Time >= B & D$Time <= E,]
+    Data <- rbind (Data, D)
+  }
+  save(Data, file='AKRDforCSET.Rdata')
+  Data1 <- rbind (Data1, Data)
+  Data <- data.frame()
+  Project <- 'DEEPWAVE'
+  for (flt in 1:26) {
+    fname = sprintf("%s%s/%srf%02d.nc", Directory,Project,Project,flt)
+    fno <- flt
+    D <- getNetCDF (fname, VarList, F=fno)
+    D$QR <- D$ADIFR / D$QCF
+    D$QR[D$QCF < 20] <- NA
+    D$QR[is.infinite(D$QR)] <- NA
+    D$AOAREF <- (D$PITCH - (D$GGVSPD / D$TASF) * (180 / pi)) 
+    D$M <- MachNumber (D$PSF, D$QCF)
+    D$WICS <- SmoothInterp (D$WIC)
+    CutoffPeriod <- 600
+    Rate <- 1
+    D$AOAREFS <- zoo::na.approx (as.vector(D$AOAREF), maxgap=1000*Rate, na.rm = FALSE)
+    D$AOAREFS[is.na(D$AOAREFS)] <- 0
+    D$AOAREFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$AOAREFS)
+    D$AOAREFF <-  D$AOAREF - D$AOAREFS
+    D$QRS <- zoo::na.approx (as.vector(D$QR), maxgap=1000*Rate, na.rm = FALSE)
+    D$QRS[is.na(D$QRS)] <- 0
+    D$QRS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QRS)
+    D$QRF <-  D$QR - D$QRS
+    D$QCFS <- zoo::na.approx (as.vector(D$QCF), maxgap=1000*Rate, na.rm = FALSE)
+    D$QCFS[is.na(D$QCFS)] <- 0
+    D$QCFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QCFS)
+    D$MS <- zoo::na.approx (as.vector(D$M), maxgap=1000*Rate, na.rm = FALSE)
+    D$MS[is.na(D$MS)] <- 0
+    D$MS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$MS)
+    D$MF <-  D$M - D$MS
+    ## limit to times between first TASX > 90 and last TASX > 90:
+    TS <- D$Time[D$TASX > 90]
+    TS <- TS[!is.na(TS)]
+    B <- TS[1]; E <- TS[length(TS)]
+    D <- D[D$Time >= B & D$Time <= E,]
+    Data <- rbind (Data, D)
+  }
+  save(Data, file='AKRDforDEEPWAVE.Rdata')
+  Data$RF <- Data$RF + 200
+  Data <- rbind (Data1, Data)
+} else {
+  load(file='AKRDforORCAS.Rdata')
+  Data1 <- Data
+  Data1$RF <- Data1$RF + 100
+  load(file='AKRDforCSET.Rdata')
+  Data <- rbind (Data, Data1)
+  Data1 <- Data
+  load(file='AKRDforDEEPWAVE.Rdata')
+  Data$RF <- Data$RF + 200
+  Data1 <- rbind (Data, Data1)
+}
+## add SOCRATES flights:
+Data <- data.frame()
+Project <- 'SOCRATES'
+for (flt in c(-1, -2, 1, 2, 3, 4)) {
+  if (flt < 0) {
+    fname = sprintf("%s%s/%stf%02d.nc", Directory,Project,Project,-flt)
+    fno <- 50 - flt
+  } else {
+    fname = sprintf("%s%s/%srf%02d.nc", Directory,Project,Project,flt)
+    fno <- flt
+  }
+  D <- getNetCDF (fname, VarList, F=fno)
+  D$QR <- D$ADIFR / D$QCF
+  D$QR[D$QCF < 20] <- NA
+  D$QR[is.infinite(D$QR)] <- NA
+  D$AOAREF <- (D$PITCH - (D$GGVSPD / D$TASF) * (180 / pi)) 
+  D$M <- MachNumber (D$PSF, D$QCF)
+  D$WICS <- SmoothInterp (D$WIC)
+  CutoffPeriod <- 600
+  Rate <- 1
+  D$AOAREFS <- zoo::na.approx (as.vector(D$AOAREF), maxgap=1000*Rate, na.rm = FALSE)
+  D$AOAREFS[is.na(D$AOAREFS)] <- 0
+  D$AOAREFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$AOAREFS)
+  D$AOAREFF <-  D$AOAREF - D$AOAREFS
+  D$QRS <- zoo::na.approx (as.vector(D$QR), maxgap=1000*Rate, na.rm = FALSE)
+  D$QRS[is.na(D$QRS)] <- 0
+  D$QRS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QRS)
+  D$QRF <-  D$QR - D$QRS
+  D$QCFS <- zoo::na.approx (as.vector(D$QCF), maxgap=1000*Rate, na.rm = FALSE)
+  D$QCFS[is.na(D$QCFS)] <- 0
+  D$QCFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QCFS)
+  D$MS <- zoo::na.approx (as.vector(D$M), maxgap=1000*Rate, na.rm = FALSE)
+  D$MS[is.na(D$MS)] <- 0
+  D$MS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$MS)
+  D$MF <-  D$M - D$MS
+  ## limit to times between first TASX > 60 and last TASX > 60:
+  TS <- D$Time[D$TASX > 60]
+  TS <- TS[!is.na(TS)]
+  B <- TS[1]; E <- TS[length(TS)]
+  D <- D[D$Time >= B & D$Time <= E,]
+  Data <- rbind (Data, D)
+}
+save(Data, file='AKRDforSOCRATES.Rdata')
+Data$RF <- Data$RF + 300
+Data <- rbind (Data1, Data)
+save(Data, file='AKRDdata.Rdata')  ## this is the all-project data.frame
+
+@
+
+<<reloadIfNeeded, eval=!NewCoefficients>>=
+
+load('AKRDdata.Rdata')
+
+@  
+
+<<buildDF, cache=TRUE>>=
+
+DF <- data.frame()
+best <- c(1,2,3,6,8,9,11,14,18)+100
+for (flt in best) {
+  if (flt == 112) {next}
+  D <- Data[Data$RF == flt, ]
+  D <- D[601:(nrow(D)-600), ]
+  DF <- rbind (DF, D)
+} 
+best <- c(1,2,3,4,6,10,12,16)
+for (flt in best) {
+  D <- Data[Data$RF == flt, ]
+  D <- D[601:(nrow(D)-600), ]
+  DF <- rbind (DF, D)
+} 
+best <- c(1,2,3,4,5,8,9,10,11,12,13,14,16,17,18,19,20,21,22,24,25,26) + 200
+for (flt in best) {
+  if (flt == 112) {next}
+  D <- Data[Data$RF == flt, ]
+  D <- D[601:(nrow(D)-600), ]
+  DF <- rbind (DF, D)
+} 
+best <- c(51,52) + 300
+for (flt in best) {
+  D <- Data[Data$RF == flt, ]
+  D <- D[601:(nrow(D)-600), ]
+  DF <- rbind (DF, D)
+} 
+DF <- DF[DF$TASX > 110 & abs(DF$ROLL) < 2, ]
+## now have data.frame DF containing values for fitting
+
+@
+
+<<fits-to-DF>>=
+
+if (NewCoefficients) {
+  f <- lm (AOAREF ~ QR + I(QR*M), data=DF)
+  cf <- coef(f)
+  ff <- lm (AOAREFF ~ 0 + QRF, data=DF)
+  cffn <- coef (ff)
+  cff <- 21.481   ## force DEEPWAVE value
+  fs <- lm(AOAREFS~QRS+QCFS, data=DF)
+  cfs <- coef(fs)
+  save (cffn, cff, cfs, ff, fs, file='AKRD-fit-coef.Rdata')
+} else {
+  load (file='AKRD-fit-coef.Rdata')
+}
+
+@
+
+\subsubsection{Fit results}
+
+The result of fitting using (\ref{eq:alpha-fast}) was $c_{1}=$\Sexpr{round(cffn,4)},
+but an earlier fit to more selective speed-run and other data in DEEPWAVE
+suggested a value of $c_{1}=21.481$, as described in the NCAR Technical
+Note on Wind Uncertainty (\citet{Cooper2016ncartn}). That appears
+to provide a good representation of the CSET/ORCAS/SOCRATES data as
+well, so that coefficient will be used here. For the low-pass component,
+the coefficients from the fit to (\ref{eq:alpha-slow}) were \{$d$\}
+= \{\Sexpr{round(cfs[1], 4)}, \Sexpr{round(cfs[2], 4)}, \Sexpr{round(cfs[3], 6)}\},
+and the residual standard deviation for this fit was \Sexpr{round(summary(fs)$sigma, 3)}.
+These results are discussed further in a presentation that is available
+\href{https://drive.google.com/open?id=0B1kIUH45ca5ALXktNklmdkl3bFU}{here},
+where the choice for $c_{1}$ is also explained.
+
+\section{Measurements from LAMS \textendash{} ARISTO-2017\label{sec:Measurements-from-LAMS}}
+
+The purpose of this section is to consider if the LAMS measurements
+from ARISTO2017 are consistent with the previous study of the PCor
+function as presently documented in the Processing Algorithms Technical
+Note. During this GV project, the LAMS was flown in a 4-beam configuration.
+The beam assignments were non-standard, though: Beam 2 was approximately
+in the forward direction, and beams 1, 3 and 4 were approximately
+$35^{\circ}$ from the longitudinal axis with beam 1 upward, beam
+3 outboard and downward, and beam 4 inboard and downward. Relative
+to an azimuthal angle starting from the downward direction they were,
+respectively, 180, $60$ and -60$^{\circ}$ in clockwise rotation
+about the forward longitudinal axis. Although there were four beams,
+the fourth seldom produced useful measurements so it will be necessary
+to use the three-beam solution for the wind vector.
+
+There were six research flights in ARISTO-2017, but the LAMS was not
+operational on the last two so those will not be used here. Research
+flight 4 was particularly useful because it extended to low level
+and so expanded the envelope of measurements that can constrain the
+pressure-correction algorithms.  
+
+For ARISTO-2017, the line-of-sight beam speeds were determined in
+two ways. Matt Hayman improved upon the processing method originally
+used by Scott Spuler in the 2014 study. This usually worked very well.
+Because there was tight coupling to the expected measured TAS (with
+adjustment for the beam angles), it might be suspect that the method
+may be biased toward the TAS value at times that have a marginal signal.
+Therefore, a second method was to fit the background using Savitzgy-Golay
+polynomials and then search for peaks above this background, as was
+done in the original 2014 PCor determination. When signals were strong,
+the method usually produced the same result as the PCA method, but
+it was more prone to failure during periods where the signal was weak.
+ In this report, Matt's processing will be used with additional restrictions
+requiring his estimate of uncertainty to meet specified tests for
+the measurement to be accepted. Because there are many good measurements,
+this helps avoid cases where the measurements might be suspect and
+perhaps biased toward the standard TAS.
+
+Although there are many uses of the LAMS measurements, as described
+in previous reports and memos, here the focus will be on checking
+the PCor function currently in use and revising it if necessary. The
+function can be found at \href{https://drive.google.com/open?id=0B1kIUH45ca5Aa29JbjJkel82NFU}{this URL},
+on pages 29\textendash 31.
+
+\subsection{Data processing}
+
+The original netCDF files, with names like ARISTO2017rf01.nc, contain
+512-element arrays of the LAMS frequency measurements each time interval,
+with names like BEAM\{1\textendash 4\}\_LAMS. For ARISTO-2017, Matt
+Hayman produced auxiliary files with names like\\
+ARISTO2017rf04\_LAMS\_TAS\_Update.nc . These files contain 28 new
+variables, in particular line-of-sight speeds (V\_LOS\_Beam\{1-3\}
+and Cartesian-coordinate velocity components (AIRSPEED\_\{X,Y,Z\}\_LAMS)
+in the LAMS coordinate system. The files also include variables V\_LOS\_Beamx\{1-3\}\_Uncertainty,
+estimates of the uncertainty in the line-of-sight airspeeds, which
+have values ranging from 0 to 10.\footnote{It appears that values of 0 are where there is no measurement (e.g.,
+before takeoff), values of 10 indicate low-uncertainty estimates that
+perhaps should be excluded from the present study, and the remaining
+values mostly range between 0 and 1 and are the values to be used
+in this study. Most are below 0.1, so it may be useful to consider
+only those measurements with associated uncertainty larger than 0
+but smaller than 0.1. This needs to be checked with Matt.} Additional variables (AIRSPEED\_\{X,Y,Z\}\_EST) are the result of
+Kalman-filter adjustment using measurements from LAMS and the standard
+system, so they should not be used for the present study. Some additional
+variables are present in these files, but the line-of-sight speeds
+will be the primary input used here.
+
+The processing chain used for this report was as follows:
+\begin{enumerate}
+\item A Python routine, with minor modifications from that used previously
+in the 2014 study and the C-130 study that used ARISTO-2015 and ARISTO-2016,
+was used to find line-of-sight airspeeds along all the beams. It is
+LAMS\_ARISTO.py and the version used is in the directory \textasciitilde{}cooperw/RStudio/ARISTO-2017.
+It reads the original netCDF file containing the beam histograms in
+variables BEAMx\_LAMS, each a 512-element histogram.\footnote{The long\_name attributes are ``LAMS Histogram Maximums'' \textendash{}
+this should be changed because one must find the peak from the 512-element
+array.} The new variables produced by this Python routine are BEAMxspeed
+where x is \{1\textendash 4\}. 
+\item The variables V\_LOS\_Beam\{1,2.3\} are produced by Matt's processing.
+They are in separate netCDF files that have only the new variables,
+so they must be merged into the composite data.frame so they can be
+used conveniently with the other standard variables and the BEAMxspeed
+variables. This is done by the R code in the ``merge: chunk, which
+is included here for reference and is not executed because all four
+beams have been processed in this way and saved in a composite data.frame
+named DataM.\footnote{Because the files produced by Matt did not have RAF-standard times,
+the ``merge'' chunk includes reference to a special version of getNetCDF
+called getNetCDFMH() that assigned the correct times so that the measurements
+could be merged with the Python-produced files.} The individual flights are identified by the variable RF containing
+the flight number, so individual flights can be selected via, e.g.,
+DataM{[}DataM\$RF=4,{]}.
+\item The subsequent analysis is then contained in this file (WindInSOCRATES.Rnw).
+Preliminary checks indicated good agreement between Matt's processing
+and the Savitzky-Golay approach, so if this study is repeated in the
+future it will be preferable to omit the Python routine and use only
+Matt's variables.
+\end{enumerate}
+<<merge, eval=FALSE, echo=FALSE>>=
+
+## don't run after the first time: saves DataM.Rdata
+source ('chunks/mergeMatt.R')
+
+@
+
+Although the Python routine calculated horizontal wind variables and
+other results derived from the line-of-sight airspeeds, all such variables
+were recalculated in the present R routine (this file) to generate
+measurements of vertical and horizontal wind, airspeed, and angles
+of attack and sideslip. For airspeed, angle of attack, and sideslip,
+these steps were used:
+\begin{enumerate}
+\item The three-beam measurements were used to determine a three-dimensional
+relative wind vector \textbf{RW}=\{$\mathrm{RW}_{x},\,\mathrm{RW}_{y},\,\mathrm{RW_{z}}$\}\textbf{
+}with components inbound along the longitudinal forward, lateral starboard,
+and lateral downward axis in the coordinate frame of the LAMS IRU
+(with attitude angles CPITCH, CROLL, CTHDG). The algorithm is documented
+in \href{https://drive.google.com/open?id=0B1kIUH45ca5AalZOWHlscnprbnc}{LAMSprocessing4Bwind.pdf}.
+However, the three-beam version is used here.
+\item The airspeed is then the magnitude of the vector \textbf{RW}.
+\item The angle of attack is $\alpha=\arctan\left(\mathrm{RW}_{z}/\mathrm{RW}_{x}\right)$
+and the sideslip angle is $\beta=\arctan\left(\mathrm{RW}_{y}/\mathrm{RW}_{x}\right)$.
+These are in the reference frame of the LAMS (i.e., that defined by
+the CMIGITS IRU).
+\end{enumerate}
+For measurements of wind, the Ranadu function Ranadu::WindProcessor()
+was used to calculate the wind based on LAMS-based variables for airspeed,
+angle of attack, and sideslip and the CMIGITS-provided attitude angles
+and ground-speed components. The complementary-filter adjustment provided
+by ``WindProcessor()'' is suppressed because the Kalman-filter processing
+in the CMIGITS accounts for the GPS-provided measurements of ground
+speed.\footnote{Some adjustment may be needed to these values because I think the
+GPS antenna used is the standard one mounted below the fuselage and
+therefore separated from the LAMS pod.}
+
+The next step is then to run this routine, ``WindInSOCRATES.Rnw'',
+in RStudio to generate the PDF document. That program contains a suppressed
+R chunk called 'merge' that should be executed on the first run to
+merge Matt's variables into this file. After the first run, the program
+will load the merged data.frame from ``DataM.Rdata''.
+
+\subsection{Results}
+
+The first comparison shown is the along-beam measurements of airspeed
+from LAMS in comparison to the wind vector from the standard wind-sensing
+system projected in the direction of the beams. For these plots, the
+relative-wind vector from the standard radome-based system is transformed
+to the Earth-relative l-frame and then to the reference frame of the
+LAMS, here called the g-frame by analogy to the gust-pod reference
+frame discussed elsewhere. This gives the relative-wind vector in
+the LAMS reference frame, which (like the a-frame) has x-axis forward,
+y-axis starboard and z-axis downward. The dot product of the unit
+vectors representing the orientations of the LAMS beams with the LAMS-relative
+wind then gives the expected along-beam airspeeds as predicted from
+the standard measurement of relative wind. Those unit vectors\footnote{It would be useful to learn if there are better values for these angles
+for ARISTO-2017.} are:\\
+\[
+\left(\begin{array}{ccc}
+\cos(35) & 0 & \sin(35)\\
+1 & 0 & 0\\
+\cos(35) & -\sin(35)\sin(60) & -\sin(35)\cos(60)\\
+\cos(35) & \sin(35)\sin(60) & -\sin(35)\cos(60)
+\end{array}\right)
+\]
+
+<<beamProcessing, echo=FALSE, include=TRUE, fig.cap=c('Airspeed measurements along LAMS beams for ARISTO2017 flights 1--4. The prediction is based on transforming the standard radome-based wind vector to the LAMS reference frame and then finding the projection of that wind along the directions of the LAMS beams.', 'Airspeed measurements along LAMS beams for ARISTO2017 flights 1--4. The prediction is based on transforming the standard radome-based wind vector to the LAMS reference frame and then finding the projection of that wind along the directions of the LAMS beams.'), cache=TRUE>>=
+
+PCA <- TRUE
+load('DataM.Rdata')
+Theta <- c(35, 0, 35, 35) * pi / 180  ## need new values for ARISTO2017
+Phi <- c(180, 0, 60, -60) * pi / 180
+
+source('chunks/processWind.R')
+DW <- processWind (DataM)
+DataM$TASL <- DW$TASX3
+DataM$WDL <- DW$WDN
+DataM$WSL <- DW$WSN
+DataM$WIL <- DW$WIN
+DataM$VXG <- DW$VXG
+DataM$VYG <- DW$VYG
+DataM$VZG <- DW$VZG
+# DataM$V_LOS_Beam1 <- DW$V_LOS_Beam1  ## these values have interpolation,
+                                       ## so don't make this substitution
+uv <- c(cos(Theta), -sin(Theta)*sin(Phi), -sin(Theta)*cos(Phi))
+dim(uv) <- c(4,3)
+DataM$UXA <- with(DataM, TASX / sqrt(1 + tan(ATTACK*pi/180)^2 + tan(SSRD*pi/180)^2))
+RWA <- with(DataM, c(UXA, UXA*tan(ATTACK*pi/180), UXA*tan(SSRD*pi/180)))
+dim(RWA) <- c(nrow(DataM), 3)
+RWL <- XformLA(DataM, RWA)
+## make small adjustments to LAMS attitude angles, as indicated by LOS plots:
+# DataM$CPITCH_LAMS <- DataM$CPITCH_LAMS + 2
+# DataM$CTHDG_LAMS <- DataM$CTHDG_LAMS + 2
+DLAMS <- with(DataM, data.frame(Time, ROLL=CROLL_LAMS, PITCH=CPITCH_LAMS+2, THDG=CTHDG_LAMS+2))
+RWB <- XformLA(DLAMS, RWL, .inverse=TRUE)
+LOSV <- RWB %*% t(uv)
+DataM$BX1 <- LOSV[,1]
+DataM$BX2 <- LOSV[,2]
+DataM$BX3 <- LOSV[,3]
+DataM$BX4 <- LOSV[,4]
+# impose restrictions here
+DataR <- DataM[DataM$TASX > 90,]
+DataR <- DataR[abs(DataR$ROLL) < 3, ]
+DataR <- DataR[DataR$V_LOS_Beam2_Uncertainty > 0.001 & DataR$V_LOS_Beam2_Uncertainty < 0.1, ]
+layout(matrix(1:2, ncol=2), widths=c(8,7), heights=c(5,5)) 
+op <- par (mar=c(5,4,1,1)+0.1, oma=c(1.1,0,0,0)) 
+with(DataR, plotWAC(data.frame(BX1, BEAM1speed), type='p', pch=20, col='blue', xlab='predicted from std wind', ylab='LAMS measurement')) 
+lines(c(-50, 300), c(-50, 300), col='darkorange', lwd=3, lty=2) 
+title('beam 1') 
+op <- par (mar=c(5,2,1,1)+0.1) 
+with(DataR, plotWAC(data.frame(BX2, BEAM2speed), type='p', pch=20, col='blue', xlab='predicted from std wind', ylab='LAMS measurement')) 
+lines(c(-50, 300), c(-50, 300), col='darkorange', lwd=3, lty=2) 
+title('beam 2')
+op <- par (mar=c(5,4,1,1)+0.1, oma=c(1.1,0,0,0))
+with(DataR, plotWAC(data.frame(BX3, BEAM3speed), type='p', pch=20, col='blue', xlab='predicted from std wind', ylab='LAMS measurement'))
+lines(c(-50, 300), c(-50, 300), col='darkorange', lwd=3, lty=2)
+title('beam 3')
+op <- par (mar=c(5,2,1,1)+0.1)
+with(DataR, plotWAC(data.frame(BX4, BEAM4speed), type='p', pch=20, col='blue', xlab='predicted from std wind', ylab='LAMS measurement'))
+lines(c(-50, 300), c(-50, 300), col='darkorange', lwd=3, lty=2)
+title('beam 4')
+
+
+@
+
+The results are shown in Figs.~1 and 2, after adjustments to the
+pitch and heading angles from the CMIGITS, each by $+2^{\circ}$.
+Without these shifts, there are obvious offsets in the cases of beams
+1 and 3. This suggests that the LAMS IRU may not be oriented exactly
+along the LAMS axis. The plot for beam 4 is based on the approach
+that uses Savitzky-Golay polynomials\footnote{Analysis using the S-G polynomials produced results in good agreement
+with Matt's, but were more often missing, especially in cases where
+Matt assigns an uncertainty of more than 1 m/s.} because Matt did not produce beam-4 LOS values. These have not been
+used in the TAS calculation and were often missing. 
+
+<<plotWind, echo=FALSE, include=TRUE, fig.cap='Wind measurements from ARISTO-2017 flight 3. The blue lines are from the standard wind-sensing system and the green lines are from LAMS.'>>=
+
+Flight <- 3
+layout(matrix(1:3, ncol = 1), widths = 1,  heights = c(5,5,6))
+op <- par (mar=c(2,4,1,1)+0.1, oma=c(1.1,0,0,0))
+with(DataM[DataM$RF == Flight & DataM$TASX > 50,], plotWAC(data.frame(Time, WDC, WDL), legend.position='bottom', ylab='WD [deg]'))  #, ylim=c(250,360))
+#title(fname)
+with(DataM[DataM$RF == Flight & DataM$TASX > 50, ], plotWAC(data.frame(Time, SmoothInterp(WSC), SmoothInterp(WSL)), ylim=c(0,50), legend.position='topright', ylab='WS [m/s]'))
+op <- par (mar=c(5,4,1,1)+0.1)
+with(DataM[DataM$RF == Flight & DataM$TASX > 50, ], plotWAC(data.frame(Time, SmoothInterp(WIC), SmoothInterp(WIL)), ylim=c(-5,5), legend.position='top', ylab='WI [m/s]'))
+abline(h=0, col='darkorange', lty=2, lwd=3)
+
+@
+
+<<tasPlot, echo=FALSE, include=TRUE, fig.cap='Comparison of measurements of airspeed by the conventional system (TASX) and by the LAMS (TASL). Restrictions have been applied to isolate a subset of measurements expected to be most reliable, as discussed in the text.'>>=
+
+layout(matrix(1:1, ncol=1), widths=1, heights=6)
+# with(DataR, plotWAC(data.frame(Time, TASX, TASL)))
+with(DataR, plotWAC(data.frame(TASL, TASX),xlab='TASX [m/s]', ylab='TASL [m/s]', type='p', pch=20, col='blue'))
+lines(c(50,300), c(50,300), col='darkorange', lwd=3, lty=2)
+
+@
+
+The airspeeds obtained by the LAMS and by the standard pitot-tube-based
+wind sensing system are in excellent agreement, as shown in Fig.~\ref{fig:tasPlot}.
+A regression fit to TASX as a linear function of TASL gives an intercept
+coefficient of -0.12 m/s and a slope coefficient of 0.9994, with a
+residual standard deviation of 0.43 m/s for 19,075 measurements from
+flights 1\textendash 4 of ARISTO-2017. These qualifications were imposed
+for a measurement to be accepted in these plots: 
+\begin{enumerate}
+\item TASX > 90, to eliminate flight periods with possible flaps during
+takeoff and landing;
+\item |roll| < $3^{\circ}$, to eliminate turns;
+\item 0.001< V\_LOS\_Beam2\_Uncertainty < 0.1, to eliminate the points found
+by Matt Hayman's processing to have higher uncertainty, or in the
+case of value 0 to be missing.
+\end{enumerate}
+<<TASfit, echo=TRUE, include=TRUE>>=
+
+lfTAS <- lm(TASX ~ TASL, data=DataR)
+SummarizeFit(lfTAS)
+
+@
+
+\subsection{Recommendation: PCor function}
+
+Because the measurements TASX and TASL agree so well, it does not
+seem useful to adjust the ``PCor'' function for PSF and QCF\@.
+Instead, this check should be regarded as a test that the PCor correction
+remains appropriate, and it should be left at the standard formula
+for consistency with other projects.
+
+\section{Study of the Pitot-Static Sensor }
+
+New measurements were available during ARISTO-2017 from a pitot-static
+sensor designed to minimize the problems with high-frequency noise
+arising from line resonance in the standard system. The new variables
+are QCTF and PSTF, representing the dynamic and static (ambient) pressure.
+Because the sensor is located in a region where flow distortion around
+the aircraft is severe, the static pressure differs significantly
+from the standard measurements including PSF and PSFC\@. However,
+the static pressure is not particularly useful because there is already
+a good measurement of static pressure available from the static-button
+ports and associated sensor. It is the measurement of dynamic pressure
+that is needed to improve high-frequency measurements of wind.
+
+\subsection{A proposed algorithm\label{subsec:pitot-static-algorithm} }
+
+<<compileSocratesDF, echo=FALSE, cache=TRUE>>=
+
+Directory <- DataDirectory()
+Project <- 'SOCRATES'
+VL <- standardVariables(c('PSTF', 'QCTF', 'PSFC', 'QCXC', 'PSF', 'QCF', 'QCFC', 'ROLL'))
+Data <- data.frame()
+for (F in 1:7) {
+  D <- getNetCDF(sprintf('%s%s/%srf%02d.nc', Directory, Project, Project, F), VL)
+  D <- D[D$TASX > 70 & abs(D$ROLL) < 3, ]
+  D$RF <- F
+  ## eliminate some bad points at the start of rf06:
+  if (F == 6) {
+    D <- D[300:nrow(D), ]
+  }
+  Data <- rbind(Data, D)
+}
+for (F in 1:2) {
+  D <- getNetCDF(sprintf('%s%s/%stf%02d.nc', Directory, Project, Project, F), VL)
+  D <- D[D$TASX > 70 & abs(D$ROLL) < 3, ]       
+  D$RF <- F+50
+  Data <- rbind(Data, D)
+}
+for (F in 1:3) {       
+  D <- getNetCDF(sprintf('%s%s/%sff%02d.nc', Directory, Project, Project, F), VL)
+  D <- D[D$TASX > 70 & abs(D$ROLL) < 3, ]
+  D$RF <- F+70
+  Data <- rbind(Data, D)
+}
+
+@
+
+<<totalPressure, include=TRUE, echo=FALSE, fig.cap='Total pressure measured by the pitot-static tube (PSTF+QCTF) vs the total pressure measured by the standard wind-sensing system (QCF+PSF). A Deming fit to these two variables gives an offset of 0.015 hPa and a slope coefficient of 1.000004, with a standard deviation between measurements of 0.14 hPa.', cache=TRUE>>=
+
+Data$PTOT <- Data$PSF + Data$QCF
+Data$PTOT2 <- Data$PSTF + Data$QCTF
+with(Data, plotWAC(data.frame(PTOT, PTOT2), xlab='PSF+QCF [hPa]', 
+                    ylab='PSTF+QCTF [hPa]', type='p', pch=20))
+refline(300,1200)
+
+@
+
+Nevertheless, it is necessary to deal with the static-pressure measurement
+PSTF because QCTF is the difference between the measurements of total
+pressure at the stagnation point in the tube and the measured static
+pressure. The total pressure measurement is PSTF+QCTF, and it is in
+remarkable agreement with PSF+QCF, as shown in Fig.~\ref{fig:totalPressure}.
+(The mean difference is 0.03 hPa; the sample standard deviation of
+that difference is 0.12.) While the pitot-static measurements could
+be approached like those of the gust-pod, seeking empirical equations
+that provide a match to QCFC, another approach is instead to subtract
+a smoothed version of the ambient pressure measured by the standard
+system (PSFC) from QCTF+PSTF to obtain QCTC. 
+
+<<TASspec, include=TRUE, echo=FALSE, fig.cap='The variance spectrum for airspeed (TASX) for the period 4:00:00 -- 5:00:00 UTC during SOCRATES flight 1.'>>=
+
+DataT <- Data[Data$RF == 1, ]
+DataT <- DataT[300:nrow(DataT), ]
+DataT <- DataT[!is.na(DataT$Time), ]
+DataT <- DataT[setRange(DataT, 40000, 50000),]
+g <- VSpec(DataT, 'TASX', VLabel='Airspeed (TASX) [m/s]', method='MEM')
+print(g + theme_WAC())
+
+@
+
+<<PSFspec, include=TRUE, echo=FALSE, fig.cap='Variance spectra for QCF and PSF for the same period as in the previous plot.'>>=
+
+g <- VSpec(DataT, 'QCF', method='MEM')
+g <- VSpec(DataT, 'PSF', col='forestgreen', method='MEM', ADD=g)
+print(g + theme_WAC())
+
+@
+
+It is useful to consider first the characteristics of the standard
+measurements of ambient, dynamic and total pressure. An example is
+a region with moderately low turbulence, 4:00:00\textendash 5:00:00
+UTC on SOCRATES flight 1, which is characterized at high frequency
+by an eddy dissipation rate of about $10^{-5}\mathrm{m}^{2}\mathrm{s}^{-3}$.
+The spectral variance for the airspeed measurement is shown in Fig.~\ref{fig:TASspec},
+and at low rate there are no evident problems. The corresponding plot
+for dynamic pressure (QCF or QCFC) looks similarly good. In contrast,
+the plot for the variable PSF has much lower amplitude, as shown in
+Fig.~\ref{fig:PSFspec}, and shows a clear noise floor corresponding
+to that expected for a random error of about 0.15 hPa. This matches
+the quoted uncertainty for the transducer (see ``accuracy'' at \href{https://www.eol.ucar.edu/system/files/inttransmitters.pdf}{this URL}).
+For measurements at frequencies above about 0.1 Hz, the measurement
+PSF is dominated by noise and does not provide useful information.
+
+<<PTOTspectra, include=TRUE, echo=FALSE, fig.cap='Measurements of total pressure (ambient plus dynamic) from the standard system and from the new pitot-static system. Data from SOCRATES flight \\#1, 4:00:00--5:00:00 UTC.', cache=TRUE>>=
+
+Project <- 'SOCRATES'
+VL <- standardVariables(c('PSTF', 'QCTF', 'PSFC', 'QCXC', 'PSF', 'QCF', 'QCFC', 'ROLL'))
+DataHR <- getNetCDF(sprintf('%s%s/%srf01_hr.nc', Directory, Project, Project), VL, Start=40000, End=50000)
+DataHR$PTOT <- DataHR$PSF + DataHR$QCF
+DataHR$PTOT2 <- DataHR$PSTF + DataHR$QCTF
+DataHR$PTOTD <- removeSpikes(DataHR$PTOT2, sdLimit=2)  ## very aggressive limit
+g <- VSpec(DataHR, 'PTOT', VLabel='total p, std', method='MEM')
+g <- VSpec(DataHR, 'PTOT2', VLabel='total p, new', method='MEM', ADD=g)
+g <- VSpec(DataHR, 'PTOTD', VLabel='total p, new, despiked', method='MEM', ADD=g)
+print(g + theme_WAC())
+
+@
+
+Although the total pressure measurements from the standard and the
+pitot-static sensors agree well for 1-Hz measurements, as shown in
+Fig.~\ref{fig:totalPressure}, the two differ significantly in high-frequency
+response, as shown in Fig.~\ref{fig:PTOTspectra}, because there
+is much more noise in the standard measurements. The pitot-static
+sensor did not show a similar increase proportional to frequency,
+as expected for random noise, but it did show some apparent flattening
+in the frequency range above about 4\_Hz. Both the standard and pitot-static
+measurements have some apparently spurious spikes in the time period
+used, but an aggressive elimination of possible spikes lowered the
+spectrum for the pitot-static sensor (red line in the plot) but did
+not remove the flattening. Similarly, elimination of spikes\footnote{The method used was to calculate the running mean and standard deviation
+of the variable, then remove measurements that differed more than
+two standard deviations from the mean and replace them with interpolated
+values. The usual test is five standard deviations, but using two
+is the ``aggressive'' test used here only for this purpose.} in the standard total-pressure measurement only lowered the noise
+spectrum slightly (by about 25\%) but did not remove the strong evidence
+of noise in this measurement. 
+
+<<PSFF, include=TRUE, echo=FALSE, fig.cap='Filtered and unfiltered measurements of ambient pressure (PSFC) for SOCRATES Flight 1, 4:30:00 -- 5:00:00 UTC. (Spectra are smoothed in 100 logarithmically spaced bins.)', cache=TRUE>>=
+
+DT <- getNetCDF(sprintf('%s%s/%srf01_hr.nc', Directory, Project, Project),
+                VL, Start=42000, End=51000)  ## include extra segments
+DT$PSFF <- signal::filtfilt (signal::butter (3, 2/(2*25), type='low'), DT$PSFC)
+DT$PTOT2 <- DT$PSTF + DT$QCTF
+DX <- DT[setRange(DT, 43000, 50000), ]
+g <- VSpec(DX, 'PSFC', smoothBins=100)
+g <- VSpec(DX, 'PSFF', VLabel='filtered PSFC', smoothBins=100, ADD=g)
+VSpec(DX, 'PTOT2', VLabel='total pressure, p-s sensor', col='black', smoothBins=100, ADD=g) + theme_WAC()
+
+@
+
+The point of this digression into the individual variance spectra
+is that, for the method proposed, subtracting the standard pressure
+PSFC from the total pressure from the pitot-static tube will contaminate
+the result by inclusion of the noise in PSFC\@. Therefore, filtering
+to remove that noise is needed. A review of the 25-Hz data from SOCRATES
+Flight \#1 indicated that PSF consistently exhibits a noise spectrum
+for frequencies above about 0.3 Hz, so a reasonably sharp low-pass
+filter with that frequency cutoff should eliminate little real signal
+while removing the contaminating noise. Figure~\ref{fig:PSFF} shows
+the result of filtering along with the unfiltered variable PSFC and
+the total pressure measurement from the pitot-static sensor (black
+line). The true signal present in PSFC is very small at the cutoff
+frequency (0.5~Hz), so nothing but noise is lost by using the filtered
+variable. Without such filtering, the variable PSFC would contaminate
+the derived dynamic pressure from the pitot-static sensor (here, QCTC)
+if it were to be calculated from QCTC=QCTF+PSTF-PSFC, although this
+could be used for low-rate measurements. At high rate (25~Hz), the
+following should be used: QCTC=QCTF+PSTF-PSFF where PSFF is the result
+of a low-pass filter applied to PSFC.
+
+<<ResultQCTC, include=TRUE, echo=FALSE, fig.cap='Variance spectrum for the variable QCTC, the corrected dynamic pressure from the pitot-static sensor. Also shown in the corresponding spectrum from the standard measurement (QCFC). The data are from 4:00:00 -- 5:00:00 on SOCRATES Flight 1.', cache=TRUE>>=
+
+DX$QCTC <- DX$QCTF + DX$PSTF - DX$PSFF
+g <- VSpec(DX, 'QCTC', method='MEM')
+VSpec(DX, 'QCFC', method='MEM', ADD=g) + theme_WAC()
+
+@
+
+The variance spectrum for the resulting dynamic pressure from the
+pitot-static tube is shown in Fig.~\ref{fig:ResultQCTC} as the variable
+QCTC\@. Also shown is the standard measurement from the radome-based
+system (QCFC) after all corrections (often called PCors) have been
+applied. No such correction is needed for QCTC because the appropriate
+corrections have already been applied to PSFC before it is used to
+calculate QCTC. The high-frequency portion of the new spectrum is
+much better than the standard one, but it still shows some probably
+spurious flattening beyond about 3~Hz. There are easily identified
+spikes in the high-rate time series being used, but the spike-removal
+algorithm did not remove this plateau. It is important to correct
+the cause of the spikes, though, because there may also be smaller
+ones not identified by the spike-removal algorithm that nevertheless
+may contaminate the high-rate variance spectrum.
+
+Further discussion of the consequences for measurements of wind components
+will be deferred to a later section so that the gust-pod measurements
+can be discussed first and then all can be compared.
+
+
+\section{Using the Gust Pod in SOCRATES}
+
+Simple extension of the DEEPWAVE approach to the gust pod did not
+work well, so a different approach is developed in this note. The
+key problem arises from the gust-pod measurement of the relative wind,
+because the quantity needed is the relative wind with respect to the
+aircraft, not the gust pod. The gust pod is located in a region of
+distorted airflow where the sideslip and angle-of-attack components
+may affect each other, the pod is not oriented along the aircraft
+axis and may move relative to the fuselage. The wind is measured by
+combining the measurement of relative wind vector, transformed to
+a reference frame fixed relative to the Earth, with the measurement
+of the aircraft velocity vector. With the inclusion of the large pod
+in SOCRATES, the airflow distortion has become more problematic.
+
+\subsection{The general approach}
+
+The CMIGITS INS used by the gust pod performs well and provides appropriate
+measurements of the gust-pod motion relative to the Earth to use when
+calculating the wind. Small corrections required when the pitch or
+roll angles change, leading to motion of the gust pod relative to
+the aircraft reference frame, initially will be ignored. The differences
+in aircraft-velocity components between the two systems are typically
+quite small: For SOCRATEStf01, the mean difference between velocity
+components was 0.0005$\pm0.05$~m/s (sample standard deviation) for
+the easterly component and $-0.0002\pm0.06$~m/s for the northerly
+component. Most of the listed sample standard deviation was contributed
+by periods when the roll angle was outside $\pm3^{\circ}$; within
+those limits, the sample standard deviation for 1-Hz measurements
+was about 0.025~m/s. Therefore, for the purpose of the present analysis,
+no transformation or correction to the CMIGITS-provided measurements
+of aircraft velocity is needed except for the omitted compensation
+for the motion of the gust pod relative to the Honeywell INS. The
+gust pod is located 13 m behind the INS, 7 m to the port side, and
+within about 1 m vertically. However, the GPS antenna that the CMIGITS
+INS uses is at the same location as that used by standard wind processing,
+so the CMIGITS aircraft-velocity components are updated to that reference
+point. Mean updated measurements of ground-speed components should
+therefore agree.
+
+These steps then are involved in the new processing scheme:
+\begin{enumerate}
+\item Define a new reference frame, here called the g-frame. Three reference
+frames then are used here: the a-frame (defined with $\hat{x}$ forward
+along the longitudinal axis of the aircraft, $\hat{y}$ to starboard
+and perpendicular to $\hat{x}$, and $\hat{z}$ determined by the
+cross product of $\hat{x}$ and $\hat{y}$ but generally downward);
+the g-frame (defined analogously but with reference to the gust-pod
+orientation which is slightly different from the aircraft reference
+frame); and the l-frame (the local Earth-relative frame with $\hat{x}$
+eastward, $\hat{y}$ northward, and $\hat{z}$ upward). Transformation
+among these reference frames was described in the \href{https://drive.google.com/open?id=1mB-nwvaAw113nr1_2RRtIODxDj7h9W5X}{Workflow Document for the Kalman Filter Technical Note}.
+Because the CMIGITS IRU aligns with some residual error that is gradually
+corrected in flight by Kalman-filter updating, and because there is
+some motion of the wings in turbulence and as the aircraft fuel weight
+decreases, the difference in orientation between the two systems (Honeywell
+and CMIGITS) may change during the flight, so it is necessary to consider
+the attitude-angle transformation each time interval during processing
+rather than via a constant correction for the entire flight.
+\item Estimate the relative-wind components in the a-frame using gust-pod
+measurements in the g-frame. In the g-frame, the relative wind that
+would be measured is distorted unacceptably from the true relative
+wind outside the flow-distortion field of the aircraft, so the solution
+is not to simply transform the measured relative-wind vector from
+the g-frame to the l-frame. Instead, the approach here is as follows:
+\begin{enumerate}
+\item Consider the two differential-pressure measurements from the up-down
+and left-right pairs of ports on the gust pod as a two-component vector
+measurement representing the pressure difference at the gust pod.
+Make the trial assumption that the ports align with the axes defined
+by the CMIGITS INS\@. Transform this pressure-gradient vector from
+the g-frame to the a-frame, where it is resolved into $\hat{x}_{a}$
+and $\hat{y}_{a}$ components. 
+\item Find the best representation of the a-frame relative wind (approximately
+\{$V,\,V\beta,\,V\alpha$\} with $V$ the airspeed,$\beta$ the sideslip
+angle and $\alpha$ the angle of attack) {[}XXX correct the signs{]}
+by a fit to the normal a-frame relative wind as a function of standard
+measurements and the transformed pressure-gradient components. This
+will give a relative-wind vector analogous to the one from the standard
+wind-sensing system but potentially independent of the radome pressure
+measurements that are sometimes affected by line freezing or contamination
+in the lines. This preserves the backup potential of the gust pod. 
+\item It is also desirable to produce an airspeed measurement from the gust
+pod (TASG) that is independent of the standard system, but it is probably
+best to use TASX to calculate the relative wind because it is expected
+to be the best available measurement of airspeed in the a-frame. The
+``PCor'' function used to adjust the airspeed measurement for the
+static defect depends on a valid measurement of angle of attack, but
+in a relatively insensitive way, and normal processing substitutes
+an average value when no valid measurement of AKRD is available. TASG
+might provide a valuable backup in that case.
+\end{enumerate}
+\end{enumerate}
+When the aircraft rolls about its longitudinal axis, complicated changes
+occur to the CMIGITS attitude angles. A pure roll change in the a-frame
+can change all three attitude angles in the g-frame because the gust-pod
+longitudinal axis is not aligned along the aircraft longitudinal axis.
+The angle transformations must account for this or the relative-wind
+measurements will not be valid for general orientations of the aircraft.
+
+<<get-data, include=FALSE, echo=FALSE, fig.cap='', cache=TRUE>>=
+
+## combine SOCRATES tf01, ff03, and rf01 for this analysis
+Flight <- "tf01"  
+Project <- "SOCRATES"
+fname = sprintf("%s%s/%s%s.nc", Directory, Project, Project, Flight)
+# SOCRATES files use GGVSPD, have EWX, and have ADIF_GP and BDIF_GP
+VarNames <- c("VYC","GGALT","LATC", "LONC", "PSXC", "QCXC",
+              "WDC", "WSC", "GGVEW", "GGVNS", "VEW", "VNS",
+              "QCTF", "PSTF",
+              "ADIFR", "ATTACK", "SSLIP", "PITCH", "TASX",
+              "ROLL", "THDG", "BDIFR", "GGVSPD", 'EWX',
+              "ADIF_GP", "BDIF_GP", "PS_GP", "QC_GP",
+              "CROLL_GP", "CPITCH_GP", "CTHDG_GP", "WIC",
+              "CVNS_GP", "CVEW_GP", "VSPD", "CVSPD_GP",
+              "ATX", 'SSRD', 'AKRD', 'QCF', 'PSF')
+D <- getNetCDF (fname, VarNames, F=51)
+ix <- which(D$TASX > 60)
+D <- D[ix[1]:ix[length(ix)], ]
+## remove 15 min at start and end
+# D <- D[901:(nrow(D)-901), ]
+Flight <- 'ff02'
+fname = sprintf("%s%s/%s%s.nc", Directory, Project, Project, Flight)
+DD <- getNetCDF (fname, VarNames, F=72)
+ix <- which(DD$TASX > 60)
+DD <- DD[ix[1]:ix[length(ix)], ]
+# DD <- DD[901:(nrow(DD)-901), ]
+D <- rbind(D, DD)
+Flight <- 'rf01'
+fname = sprintf("%s%s/%s%s.nc", Directory, Project, Project, Flight)
+DD <- getNetCDF (fname, VarNames, F=1)
+## in rf01, gust pod problems 33000--35000
+rbad <- setRange(DD, 32500, 35000)
+DD$QC_GP[rbad] <- NA
+## wait until later to remove from the fit data.frame (DataF)
+ix <- which(DD$TASX > 60)
+DD <- DD[ix[1]:ix[length(ix)], ]
+# DD <- DD[901:(nrow(DD)-901), ]
+D <- rbind(D, DD)
+## add some variables needed for the AOA complementary-filter
+D$QR <- D$ADIFR / D$QCF
+    D$QR[D$QCF < 20] <- NA
+    D$QR[is.infinite(D$QR)] <- NA
+    D$M <- MachNumber (D$PSF, D$QCF)
+    D$WICS <- SmoothInterp (D$WIC)
+    CutoffPeriod <- 600
+    Rate <- 1
+    D$QRS <- zoo::na.approx (as.vector(D$QR), maxgap=1000*Rate, na.rm = FALSE)
+    D$QRS[is.na(D$QRS)] <- 0
+    D$QRS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QRS)
+    D$QRF <-  D$QR - D$QRS
+    D$QCFS <- zoo::na.approx (as.vector(D$QCF), maxgap=1000*Rate, na.rm = FALSE)
+    D$QCFS[is.na(D$QCFS)] <- 0
+    D$QCFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QCFS)
+    D$MS <- zoo::na.approx (as.vector(D$M), maxgap=1000*Rate, na.rm = FALSE)
+    D$MS[is.na(D$MS)] <- 0
+    D$MS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$MS)
+    D$MF <-  D$M - D$MS
+Data <- D
+Cradeg <- pi / 180.
+## this is the speed run from tf01:  [works because tf01 is first file)
+r5 <- setRange (Data, 221035, 221510)
+# r1 <- setRange (Data, 192609, 193328)
+# r2 <- setRange (Data, 195540, 200222)
+# r3 <- setRange (Data, 205058, 205604)
+# r4 <- setRange (Data, 210402, 211234)
+# Data2 <- Data[c(r1,r2,r3,r4),]
+Data2 <- Data[r5, ]
+Data2 <- Data2[abs(Data2$ROLL) < 3, ]
+r6 <- setRange(Data, 221600, 221830)
+Data3 <- Data[r6, ]
+capnFaoaG <- "For the gust pod, the angle-of-attack determined from the fit as a function of the reference angle provided by (\\ref{eq:AOAeq}), for the speed run on SOCRATES tf01. The dashed orange line is the fit to the measurements, and the thinner solid black line is the result from the coefficients determined in DEEPWAVE."
+
+@
+
+\subsection{Details of the Transformation}
+
+The vector to be transformed has components (0, BDIF\_GP, ADIF\_GP)
+in the g-frame. Because in the R package ``Ranadu'' {[}\href{https://github.com/WilliamCooper/Ranadu.git}{https://github.com/WilliamCooper/Ranadu.git}{]}
+there is a transformation function (XformLA) that transforms from
+the a-frame to the l-frame or the l-frame to the a-frame, that will
+be used here because that transformation function was tested extensively
+during the development of the Kalman filter. Details are described
+in the \href{https://github.com/WilliamCooper/KalmanFilter/blob/master/WorkflowKalmanFilter.pdf}{workflow document}
+for the Kalman filter Technical Note (\citet{Cooper2017ncartn}).
+The procedure is to transform the pressure vector from the g-frame
+to the l-frame using the CMIGITS-provided attitude angles, then transform
+from the l-frame to the a-frame using the Honeywell-provided attitude
+angles and the inverse function in XformLA(). The code listed below
+produces, in diffPa, the matrix of measured pressure differences transformed
+to the a-frame:
+
+<<xform, echo=TRUE, include=TRUE, cache=TRUE>>=
+
+diffP <- c(rep(0, nrow(Data)), Data$BDIF_GP, Data$ADIF_GP)  ## check signs!!
+dim(diffP) <- c(nrow(Data), 3)
+DF <- data.frame(ROLL=Data$CROLL_GP, PITCH=Data$CPITCH_GP, THDG=Data$CTHDG_GP)
+diffPl <- Ranadu::XformLA (DF, diffP)  ## DF contains gustpod attitude angles
+diffPa <- Ranadu::XformLA (Data, diffPl, .inverse=TRUE)  # pressure vector in a-frame
+
+@
+
+<<akfit, echo=FALSE, include=TRUE, cache=TRUE>>=
+
+Data$AK <- cff * Data$QRF + cfs[1] + cfs[2] * Data$QRS + cfs[3] * Data$QCFS
+Data$DIFFPX <- diffPa[,1]
+Data$DIFFPY <- diffPa[,2]
+Data$DIFFPZ <- diffPa[,3]
+Data$MACHG <- MachNumber(Data$PS_GP, Data$QC_GP)
+## as for AK, decompose into slow and fast components
+CutoffPeriod <- 600		## as before
+Rate <- 1
+Data$AKS <- zoo::na.approx (as.vector(Data$AK), maxgap=1000, na.rm=FALSE)
+Data$AKS[is.na(Data$AKS)] <- 0
+Data$AKS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), Data$AKS)
+Data$AKF <- Data$AK - Data$AKS
+Data$SSRDS <- zoo::na.approx (as.vector(Data$SSRD), maxgap=1000, na.rm=FALSE)
+Data$SSRDS[is.na(Data$SSRDS)] <- 0
+Data$SSRDS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), Data$SSRDS)
+Data$SSRDF <- Data$SSRD - Data$SSRDS
+Data$DV1 <- with(Data, DIFFPZ / QC_GP)
+Data$DV2 <- with(Data, (DIFFPZ / QC_GP) * MACHG)
+Data$DV3 <- with(Data, DIFFPY / QC_GP)
+Data$DV4 <- with(Data, (DIFFPZ / QC_GP)^2)
+Data$DVS1 <- Data$DV3
+Data$DVS2 <- with(Data, MACHG * DIFFPY / QC_GP)
+Data$DVS3 <- Data$DV1
+Data$DV1S <- zoo::na.approx (as.vector(Data$DV1), maxgap=1000, na.rm=FALSE)
+meanDV1 <- mean(Data$DV1, na.rm=TRUE)
+Data$DV1S[is.na(Data$DV1S)] <- meanDV1
+Data$DV1S <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), Data$DV1S)
+Data$DV1F <- Data$DV1 - Data$DV1S
+Data$DV2S <- zoo::na.approx (as.vector(Data$DV2), maxgap=1000, na.rm=FALSE)
+meanDV2 <- mean(Data$DV2, na.rm=TRUE)
+Data$DV2S[is.na(Data$DV2S)] <- meanDV2
+Data$DV2S <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), Data$DV2S)
+Data$DV2F <- Data$DV2 - Data$DV2S
+Data$DV3S <- zoo::na.approx (as.vector(Data$DV3), maxgap=1000, na.rm=FALSE)
+meanDV3 <- mean(Data$DV3, na.rm=TRUE)
+Data$DV3S[is.na(Data$DV3S)] <- meanDV3
+Data$DV3S <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), Data$DV3S)
+Data$DV3F <- Data$DV3 - Data$DV3S
+Data$DV4S <- zoo::na.approx (as.vector(Data$DV4), maxgap=1000, na.rm=FALSE)
+meanDV4 <- mean(Data$DV4, na.rm=TRUE)
+Data$DV4S[is.na(Data$DV4S)] <- meanDV4
+Data$DV4S <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), Data$DV4S)
+Data$DV4F <- Data$DV4 - Data$DV4S
+Data$DVS1S <- Data$DV3S
+Data$DVS1F <- Data$DV3F
+Data$DVS2S <- zoo::na.approx(as.vector(Data$DVS2), maxgap=1000, na.rm=FALSE)
+meanDVS2 <- mean(Data$DVS2, na.rm=TRUE)
+Data$DVS2S[is.na(Data$DVS2S)] <- meanDVS2
+Data$DVS2S <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), Data$DVS2S)
+Data$DVS2F <- Data$DVS2 - Data$DVS2S
+Data$DVS3S <- Data$DV1S
+Data$DVS3F <- Data$DV1F
+
+
+## Restrict fit to periods with low ROLL, and truncate 15 min at start/end
+## so that the filter start-and-end deviations don't affect the fit.
+## (first is.na test avoids NAs in Time where is.na(ROLL))
+DataF <- Data[!is.na(Data$ROLL) & abs(Data$ROLL) < 3, ]
+FN <- unique(DataF$RF)
+ir <- vector()
+for (F in FN) {
+  ix <- which (DataF$RF == F)
+  L <- length(ix)
+  ir <- c(ir, ix[1]:(ix[1]+899), (ix[L]-899):ix[L])
+}
+DataF <- DataF[-ir, ]
+## Eliminate a bad period in rf01, 32500--35000
+stime <- as.POSIXct('2018-01-16 03:25:00', tz='UTC')
+etime <- as.POSIXct('2018-01-16 04:05:00', tz='UTC')
+ir <- which(DataF$Time >= stime & DataF$Time <= etime)
+DataF <- DataF[-ir, ]
+fas <- lm(AKS ~ DV1S + DV2S + DV3S + DV4S, data=DataF)
+faf <- lm(AKF ~ DV1F + DV2F + DV3F - 1, data=DataF)  ## intercept not needed, suppressed
+cfas <- coef(fas)
+cfaf <- coef(faf)
+Data$AK_GPS <- with(Data, cfas[1] + cfas[2] * DV1S + cfas[3] * DV2S + cfas[4] * DV3S + cfas[5] * DV4S)
+Data$AK_GPF <- with(Data, cfaf[1] * DV1F + cfaf[2] * DV2F + cfaf[3] * DV3F)
+Data$AK_GP <- Data$AK_GPS + Data$AK_GPF
+DataF$AK_GPS <- with(DataF, cfas[1] + cfas[2] * DV1S + cfas[3] * DV2S + cfas[4] * DV3S + cfas[5] * DV4S)
+DataF$AK_GPF <- with(DataF, cfaf[1] * DV1F + cfaf[2] * DV2F + cfaf[3] * DV3F)
+DataF$AK_GP <- DataF$AK_GPS + DataF$AK_GPF
+## calculate residuals for some intermediate fits:
+cfas1 <- coef(lm(AKS ~ DV1S, data=DataF))
+cfaf1 <- coef(lm(AKF ~ DV1F - 1, data=DataF))
+atest1 <- with(DataF, cfas1[1] + cfas1[2] * DV1S + cfaf1[1] * DV1F)
+sig1 <- sqrt(with(DataF, sum((atest1-AK)^2, na.rm=TRUE) / (nrow(DataF))))
+cfas2 <- coef(lm(AKS ~ DV1S + DV2S, data=DataF))
+cfaf2 <- coef(lm(AKF ~ DV1F + DV2F - 1, data=DataF))
+atest2 <- with(DataF, cfas2[1] + cfas2[2] * DV1S + cfas2[3] * DV2S + 
+                      cfaf2[1] * DV1F + cfaf2[2] * DV2F)
+sig2 <- sqrt(with(DataF, sum((atest2-AK)^2, na.rm=TRUE) / (nrow(DataF))))
+cfas3 <- coef(lm(AKS ~ DV1S + DV2S + DV3S, data=DataF))
+cfaf3 <- coef(lm(AKF ~ DV1F + DV2F + DV3F - 1, data=DataF))
+atest3 <- with(DataF, cfas3[1] + cfas3[2] * DV1S + cfas3[3] * DV2S + cfas3[4] * DV3S + 
+                      cfaf3[1] * DV1F + cfaf3[2] * DV2F + cfaf3[3] * DV3F)
+sig3 <- sqrt(with(DataF, sum((atest3-AK)^2, na.rm=TRUE) / (nrow(DataF))))
+cfas4 <- coef(lm(AKS ~ DV1S + DV2S + DV3S + DV4S, data=DataF))
+cfaf4 <- cfaf3
+atest4 <- with(DataF, cfas4[1] + cfas4[2] * DV1S + cfas4[3] * DV2S + 
+             cfas4[4] * DV3S + cfas4[5] * DV4S +
+                      cfaf3[1] * DV1F + cfaf3[2] * DV2F + cfaf3[3] * DV3F)
+sig4 <- sqrt(with(DataF, sum((atest4-AK)^2, na.rm=TRUE) / (nrow(DataF))))
+
+@
+
+\subsection{Empirical Coefficients}
+
+\subsubsection{Angle of Attack\label{subsec:Calibration-AOA}}
+
+The standard method of calibrating the measurement of angle-of-attack
+is described in detail by \citet{Cooper2016ncartn}, and a revised
+approach is described in Sect.~\ref{subsec:AKRDcompF}. The latter
+is used here. The goal then is to find an empirical equation that
+duplicates that angle of attack (here, AK) but uses measurements from
+the gust-pod. Because of flow distortion at the gust-pod, it is expected
+that the empirical relationship will be more complicated and will
+involve the horizontal as well as vertical pressure differences from
+the gust-pod. In addition, the data used for the fit should include
+various maneuvers in addition to the speed runs normally used for
+finding a representation of AKRD.
+
+The data set used here is the combination of SOCRATES test flight
+\#1, ferry flight \#2, and research flight \#1. Test flight 1 included
+a complete set of maneuvers, so that flight provides a good range
+of conditions for the fits. Research flight \#1 included a low-level
+flight segment that is also important to include for characterization
+of this part of the flight envelope. The new variable will be called
+AK\_GP and will be determined by linear fits to variables from the
+gust-pod after transformation to the a-frame. 
+
+In addition, an approach analogous to that for the complementary-filter
+representation of AKRD will be used because it provided an improved
+representation of the angles of attack and sideslip. The same approach
+is taken: Split the reference AKRD into ``slow'' and ``fast''
+components, represent them separately using empirical functions of
+variables that are similarly filtered, and then combine them to produce
+the result for AK\_GP\@. The following table shows the residual standard
+deviation for some choices of the empirical equation. The variables
+used are: $\Delta p_{z}$: the pressure difference between top-and-bottom
+pressure ports on the gust-pod after transformation to the a-frame;
+$\Delta p_{y}$: the corresponding difference between the starboard
+and port-side pressure ports; $q_{c}$: the dynamic pressure measured
+at the forward port on the gust-pod; and $M_{g}$: the Mach number
+calculated using the uncorrected measurements QC\_GP and PS\_GP from
+the gust pod.
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline 
+\textbf{Equation} & \textbf{residual standard deviation {[}$^{\circ}${]}}\tabularnewline
+\hline 
+\hline 
+$a_{0}+a_{1}\frac{\Delta p_{z}}{q_{g}}$ & \Sexpr{round(sig1,3)}\tabularnewline
+\hline 
+$"\,+a_{2}M_{g}\frac{\Delta p_{z}}{q_{g}}$ & \Sexpr{round(sig2, 3)}\tabularnewline
+\hline 
+$"\,+a_{3}\frac{\Delta p_{y}}{q_{g}}$ & \Sexpr{round(sig3, 3)}\tabularnewline
+\hline 
+$"\,+a_{4}\left(\frac{\Delta p_{z}}{q_{g}}\right)^{2}$ & \Sexpr{round(sig4, 3)}\tabularnewline
+\hline 
+\end{tabular}
+\par\end{center}
+
+<<akplot1, echo=FALSE, include=TRUE, fig.height=5, fig.cap='Comparison of gust-pod fit result (AK\\_GP) to the complementary-filter radome-based value for angle of attack (AK), for SOCRATES test flight 1. Also shown as the red line is the difference multiplied by 5 to make the difference easier to interpret.'>>=
+
+op <- par (mar=c(5,4,1,1)+0.1, oma=c(1.1,0,0,0)) 
+with(DataF[DataF$RF == 51, ], plotWAC(data.frame(Time, AK, AK_GP, 5*(AK-AK_GP)), legend.position='topleft'))
+
+@
+
+<<akplot2, echo=FALSE, include=TRUE, fig.height=4, fig.cap='As in the preceding plot but expanded to show only the period of the speed run and without factor-of-five magnification of the difference (red line).'>>=
+
+with(Data[setRange (Data, 221035, 221510),], plotWAC(data.frame(Time, AK, AK_GP, (AK-AK_GP)), legend.position='topright'))
+
+@
+
+The resulting fit has residual standard deviation similar to that
+obtained in typical calibrations leading to AKRD, and as shown in
+Fig.~\ref{fig:akplot1} the five-coefficient fit provides a very
+good representation of AKRD. Figure.~\ref{fig:akplot2} shows an
+expanded view of the period of the speed run. The difference at large
+angle-of-attack (near 5$^{\circ}$) is a little larger than elsewhere,
+but values of the angle-of-attack this large are seldom encountered
+except during maneuvers like this.
+
+\subsubsection{Sideslip}
+
+Sideslip was handled in a similar manner, except that the reference
+SSRD was the standard variable calculated without separating into
+slow and fast components because there does not appear to be a varying
+offset to the standard sideslip angle as there is for angle-of-attack.
+That is not true for the gust-pod sideslip, however, so a complementary-filter
+representation was used for it as for angle-of-attack. Some exploration
+of possible variables to include in an empirical representation led
+to this equation:
+
+\begin{equation}
+\beta=e_{0}+\frac{\Delta p_{y}}{q_{g}}\left(e_{0}+e_{1}M_{g}\right)+e_{2}\frac{\Delta p_{z}}{q_{g}}\label{eq:newSSG}
+\end{equation}
+
+<<ss-gp, include=TRUE, echo=FALSE, fig.cap='Comparison of SS\\_GP, calculated using the new SOCRATES coefficients, to SSRD from the radome, for flights tf01, ff02, and rf01 (with some short omissions of obviously problematic measurements).'>>=
+
+## Eliminate a bad period in ff01, 214000--214300
+stime <- as.POSIXct('2018-01-09 21:40:00', tz='UTC')
+etime <- as.POSIXct('2018-01-09 21:43:00', tz='UTC')
+ir <- which(DataF$Time >= stime & DataF$Time <= etime)
+DataF <- DataF[-ir, ]
+fss <- lm(SSRDS ~ DVS1S + DVS2S + DVS3S, data=DataF)
+## uses weighted fit to increase importance of yaw maneuver
+fsf <- lm(SSRDF ~ DVS1F + DVS2F + DVS3F - 1, data=DataF, weights=abs(DataF$SSRDF))
+cfss <- coef(fss)
+cfsf <- coef(fsf)
+DataF$SS_GPS <- with(DataF, cfss[1] + cfss[2] * DVS1S + cfss[3] * DVS2S + cfss[4] * DVS3S)
+DataF$SS_GPF <- with(DataF, cfsf[1] * DVS1F + cfsf[2] * DVS2F + cfsf[3] * DVS3F)
+DataF$SS_GP <- DataF$SS_GPS + DataF$SS_GPF
+Data$SS_GPS <- with(Data, cfss[1] + cfss[2] * DVS1S + cfss[3] * DVS2S + cfss[4] * DVS3S)
+Data$SS_GPF <- with(Data, cfsf[1] * DVS1F + cfsf[2] * DVS2F + cfsf[3] * DVS3F)
+Data$SS_GP <- Data$SS_GPS + Data$SS_GPF
+with(DataF, plotWAC(data.frame(SSRD, SS_GP), xlab='SSRD', ylab='SS_GP', type='p'))
+refline(-5,5)
+sigS <- sqrt(sum((DataF$SS_GP-DataF$SSRD)^2, na.rm=TRUE) / nrow(DataF))
+
+@
+
+<<yaw-maneuver, include=TRUE, echo=FALSE, fig.cap='Comparison of SS\\_GP, calculated using the new SOCRATES coefficients, to SSRD from the radome, for the yaw maneuver from SOCRATES tf01.'>>=
+
+with(Data[setRange(Data, 221500, 221900), ], plotWAC(data.frame(Time, SSRD, SS_GP), ylab='Sideslip angle [deg.]'))
+
+@
+
+which was used to fit the slow and fast components of SSRD, except
+for the fast component the constant $e_{0}$ was omitted. The residual
+standard deviation was \Sexpr{round(sigS,2)}$^{\circ}$ for the set
+of three flights (tf01, ff02, rf01). The good correspondence between
+the radome-based sideslip angle and the gust-pod-based sideslip angle
+is shown in Fig.~\ref{fig:ss-gp}, and the yaw maneuver from SOCRATES
+tf01 (22:16:00\textendash 22:18:30) is shown in Fig.~\ref{fig:yaw-maneuver}.
+The measurements from the radome and gust pod are in remarkable agreement
+through the period of this yaw maneuver.
+
+\subsubsection{Airspeed}
+
+The equation developed in Cooper et al.~(2016) for airspeed was based
+on this fit to the ratio $q/p$ as measured by the standard system:\\
+\begin{equation}
+\frac{q}{p}=d_{0}+d_{1}\frac{q_{g}}{p_{g}}+d_{2}M_{g}\frac{q_{g}}{p_{q}}+d_{3}\left(\frac{q_{g}}{p_{g}}\right)^{2}+d_{4}\frac{\Delta p_{\alpha,g}}{q_{g}}+d_{5}M_{g}+d_{6}\left(\frac{\Delta p_{\alpha,g}}{q_{g}}\right)^{2}+d_{7}M_{g}\frac{\Delta p_{\alpha,g}}{q_{g}}\label{eq:TASG}
+\end{equation}
+where $q$ is dynamic pressure, $p$ is ambient pressure, $M_{g}$
+is the Mach number determined from the gust-pod measurements of dynamic
+and ambient pressure ($q_{g}$ and $p_{g}$), and $\Delta p_{\alpha,g}$
+is the pressure difference between top and bottom pressure ports on
+the gust-pod. The DEEPWAVE fit found coefficients \{$d_{i}$\}=\{1.1940,
+27.2893, $-29.0483$, 13.6231, $-0.5936$, $-7.5812$, 0.1554, 1.2607\}.
+Repeating the fit for the same data set used to determine coefficients
+to represent the angles of attack and sideslip gave new coefficients
+as listed below and resulting predictions for $q/p$ as shown in Fig.~\ref{fig:tasg}.
+A reasonable fit was obtained, but the high-frequency spectral variance
+of the resulting airspeed had apparent weaknesses so an approach similar
+to that used for angle-of-attack was used for $q/p$: Split all the
+linear-predictor terms (like $q_{g}/p_{g}$) into complementary low-pass
+and high-pass components, fit separately, and combine the results.
+While the fit is very good, it is significantly different from that
+found in the DEEPWAVE project. The fit coefficients for the low-pass
+and high-pass terms are listed below (where the numbered terms in
+the fit correspond respectively to the numbered coefficients in (\ref{eq:TASG})).
+
+<<tasg, include=TRUE, echo=FALSE, fig.height=4, fig.width=4, fig.cap='Predicted ratio q/p from gust-pod measurements vs that measured by the standard wind-sensing system, for the composite data from tf01, ff02 and rf01.', cache=TRUE>>=
+
+DataF$QR <- DataF$QCXC / DataF$PSXC
+# DataF$QRS <- zoo::na.approx (as.vector(DataF$QR), na.rm=FALSE)
+# rmean <- rollapply(DataF$QRS, width=51, FUN=mean, fill=NA)
+# rmean <- zoo::na.approx (as.vector(rmean), na.rm=FALSE)
+# DataF$QRS[is.na(DataF$QRS)] <- rmean[is.na(DataF$$QRS)]
+# meanQRS <- mean(DataF$QRS, na.rm=TRUE)
+# DataF$QRS[is.na(DataF$QRS)] <- meanQRS
+# DataF$QRS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), DataF$QRS)
+DataF$QRS <- SplitDV (DataF$QR, 60)
+DataF$QRF <- DataF$QR - DataF$QRS
+DataF$QRG <- DataF$QC_GP / DataF$PS_GP
+DataF$DVT2 <- DataF$QRG
+DataF$MACHG <- MachNumber(DataF$PS_GP, DataF$QC_GP)
+DataF$DVT3 <- DataF$MACHG * DataF$DVT2
+DataF$ARG <- DataF$ADIF_GP / DataF$QC_GP
+DataF$DVT4 <- DataF$QRG^2
+DataF$DVT5 <- DataF$ARG
+DataF$DVT6 <- DataF$MACHG
+DataF$DVT7 <- DataF$ARG^2
+DataF$DVT8 <- DataF$MACHG * DataF$ARG
+for (V in c('DVT2', 'DVT3', 'DVT4', 'DVT5', 'DVT6', 'DVT7', 'DVT8')) {
+  VS <- sprintf ('%sS', V)
+  VF <- sprintf ('%sF', V)
+  DataF[, VS] <- SplitDV (DataF[, V], 60)
+  DataF[, VF] <- DataF[, V] - DataF[, VS]
+}
+fmtS <- lm (QRS ~ DVT2S + DVT3S + DVT4S + DVT5S + DVT6S + DVT7S + DVT8S, data=DataF)
+fmtF <- lm (QRF ~ DVT2F + DVT3F + DVT4F + DVT5F + DVT6F + DVT7F + DVT8F - 1, data=DataF)
+print('Fit to the low-pass-filtered components:')
+SummarizeFit (fmtS)
+print('----------------------------------------')
+print('Fit to the high-pass-filtered components:')
+SummarizeFit (fmtF)
+# fmt <- lm (QR ~ QRG + I(MACHG  * QRG) + I(QRG^2) + ARG + MACHG + I(ARG^2) + I(MACHG*ARG), data=DataF)
+# cft <- coefficients(fmt)
+cftS <- coefficients(fmtS)
+cftF <- coefficients(fmtF)
+DataF$QRPS <- with(DataF, cftS[1] + cftS[2]*DVT2S + cftS[3]*DVT3S + cftS[4]*DVT4S +
+                      cftS[5]*DVT5S + cftS[6]*DVT6S + cftS[7]*DVT7S + cftS[8]*DVT8S)
+DataF$QRPF <- with(DataF, cftF[1]*DVT2F+cftF[2]*DVT3F+cftF[3]*DVT4F +
+                      cftF[4]*DVT5F+cftF[5]*DVT6F+cftF[6]*DVT7F+cftF[7]*DVT8F)
+# DataF$QRP <- with(DataF, cft[1]+cft[2]*QRG+cft[3]*MACHG*QRG+cft[4]*QRG^2+cft[5]*ARG+cft[6]*MACHG+
+#                         cft[7]*ARG^2+cft[8]*MACHG*ARG)
+DataF$QRP <- DataF$QRPS + DataF$QRPF
+with(DataF, plotWAC (data.frame(QR, QRP), xlab='standard q/p', ylab='predicted q/p', 
+                     type='p', pch=20, col='blue'))
+# title('SOCRATES tf01 speed run only')
+cfdw <- c(1.1940, 27.2893, -29.0483, 13.6231, -0.5936, -7.5812, 0.1554, 1.2607)
+DataF$QRPD <- with(DataF, cfdw[1]+cfdw[2]*QRG+cfdw[3]*MACHG*QRG+cfdw[4]*QRG^2+cfdw[5]*ARG+cfdw[6]*MACHG+
+                          cfdw[7]*ARG^2+cfdw[8]*MACHG*ARG)
+# with(DataF, points (data.frame(QR, QRPD), pch=20, col='black'))
+refline(0,6)
+# lines(c(0,1), c(0,1), col='darkgreen', lwd=2, lty=2)
+
+
+@
+
+\subsubsection{Examples of Results}
+
+<<newWindGP, include=TRUE, echo=FALSE, cache=TRUE>>=
+
+## previously calculated AK_GP, SS_GP, AK
+## for wind calculation, use TASX -- normally OK
+## but include TASG also:
+
+Data$QR <- Data$QCXC / Data$PSXC
+Data$QRG <- Data$QC_GP / Data$PS_GP
+Data$MACHG <- MachNumber(Data$PS_GP, Data$QC_GP)
+Data$ARG <- Data$ADIF_GP / Data$QC_GP
+Data$DVT2 <- Data$QRG
+Data$MACHG <- MachNumber(Data$PS_GP, Data$QC_GP)
+Data$DVT3 <- Data$MACHG * Data$DVT2
+Data$ARG <- Data$ADIF_GP / Data$QC_GP
+Data$DVT4 <- Data$QRG^2
+Data$DVT5 <- Data$ARG
+Data$DVT6 <- Data$MACHG
+Data$DVT7 <- Data$ARG^2
+Data$DVT8 <- Data$MACHG * Data$ARG
+for (V in c('DVT2', 'DVT3', 'DVT4', 'DVT5', 'DVT6', 'DVT7', 'DVT8')) {
+  VS <- sprintf ('%sS', V)
+  VF <- sprintf ('%sF', V)
+  Data[, VS] <- SplitDV (Data[, V], 60)
+  Data[, VF] <- Data[, V] - Data[, VS]
+}
+Data$QRPS <- with(Data, cftS[1] + cftS[2]*DVT2S + cftS[3]*DVT3S + cftS[4]*DVT4S +
+                      cftS[5]*DVT5S + cftS[6]*DVT6S + cftS[7]*DVT7S + cftS[8]*DVT8S)
+Data$QRPF <- with(Data, cftF[1]*DVT2F+cftF[2]*DVT3F+cftF[3]*DVT4F +
+                      cftF[4]*DVT5F+cftF[5]*DVT6F+cftF[6]*DVT7F+cftF[7]*DVT8F)
+Data$QRP <- Data$QRPS + Data$QRPF
+## replace MACHG with new value:
+Data$MACHG <- MachNumber(1, Data$QRP)
+Data$TASG <- TrueAirspeed(Data$MACHG, Data$ATX, Data$EWX / Data$PSXC)
+
+DataW <- Data 		## work data.frame for the wind calculation
+DataW$ATTACK <- Data$AK_GP
+DataW$SSLIP <- Data$SS_GP
+DataW$VEW <- Data$CVEW_GP
+DataW$VNS <- Data$CVNS_GP
+DataW$GGVSPD <- Data$CVSPD_GP
+DataW$TASX <- Data$TASG  ## might be better to use TAS from pitot-static?
+DataN <- WindProcessor (DataW, CompF=FALSE)
+Data$WIG <- DataN$WIN
+Data$WSG <- DataN$WSN
+Data$WDG <- DataN$WDN
+
+@
+
+<<tfplots4, include=TRUE, fig.cap='Comparison of measurements of the horizontal wind from the standard calculation (WDC amd WSC) and from the gust pod (WDG and WSG).'>>=
+
+layout(matrix(1:2, ncol = 1), widths = 1, heights = c(5,6)) 
+op <- par (mar=c(2,4,1,1) + 0.1)
+with(Data[Data$RF == 1, ], plotWAC(data.frame(Time, WDC, WDG)))
+op <- par (mar=c(2,4,1,1) + 0.1)
+with(Data[Data$RF == 1, ], plotWAC(data.frame(Time, WSC, WSG), legend.position='topright'))
+layout(matrix(1:1, ncol = 1), widths = 1, heights = c(6)) 
+op <- par (mar=c(5,4,1,1) + 0.1)
+
+@
+
+This processing recommended in the final section of this report was
+applied to SOCRATES research flight \#1 so that the gust-pod measurements
+of wind can be compared to the standard wind measurements based on
+the radome. Figure~\ref{fig:tfplots4} shows that the horizontal
+wind from the gust pod matches that from the standard system quite
+well.\footnote{The large spikes are associated with periods of missing gust-pod data.
+The spike-removal algorithm discussed in Sect.~5.2 has not been used
+when constructing these plots.} The wind measurements from the gust pod, entirely independent of
+variables provided by the radome, provide a valid measurement of the
+wind that is in reasonable agreement with the standard system and
+can provide a back-up measurement in cases where some problem interferes
+with the measurements from the standard system.
+
+\newpage{}
+
+\subsection{\emph{Summary\label{sec:Summary}}}
+
+Use these equations and coefficients to find the relative-flow angles
+and ratio of dynamic to ambient pressure (with MACHGG, different from
+MACHG defined below, defined as the Mach number calculated from QC\_GP
+and PS\_GP). The variables DIFFPY and DIFFPZ are defined earlier as
+the pressure-difference components measured by the gust pod and then
+transformed to the a-frame. These definitions are also used: ARG=ADIF\_GP/QC\_GP
+and QRG=QC\_GP/PS\_GP). Because the coordinate-frame transformations
+and extensive splitting for complementary representation of the results
+are complex, it seems preferable to add these variables in second-pass
+processing. That is also a convenient way to add the complementary-filter
+result for AKRD and WIC (here, AK and WIY).
+
+In the following summary, the function ``bf()'' denotes the low-pass
+Butterworth filter and ``cf()'' is the complementary high-pass filter.
+\begin{lyxlist}{00.00.0000}
+\item [{\textbf{AK\_GP:}}] \Sexpr{format(cfas[1],digits=5,nsmall=4)} +
+\Sexpr{format(cfas[2],digits=5,nsmall=4)} {*} bf(DIFFPZ / QC\_GP)
++ \\
+\Sexpr{format(cfas[3],digits=5,nsmall=4)} {*} bf(DIFFPZ/QC\_GP{*}MACHGG)
++ \\
+\Sexpr{format(cfas[4],digits=5,nsmall=4)} {*} bf(DIFFPY/QC\_GP) +
+\\
+\Sexpr{format(cfas[5],digits=5,nsmall=4)} {*} bf(DIFFPZ / QC\_GP)\textasciicircum{}2)
++\\
+\Sexpr{format(cfaf[1],digits=5,nsmall=4)} {*} cf(DIFFPZ/QC\_GP) +\\
+\Sexpr{format(cfaf[2],digits=5,nsmall=4)} {*} cf(DIFFPZ/QC\_GP{*}MACHGG)
++\\
+\Sexpr{format(cfaf[3],digits=5,nsmall=4)} {*} cf(DIFFPY/QC\_GP) 
+\item [{\textbf{SS\_GP:}}] \Sexpr{round(cfss[1], 5)} + \Sexpr{round(cfss[2], 5)}
+{*} bf(DIFFPY/QC\_GP) +\\
+\Sexpr{round(cfss[3], 5)} {*} bf(DIFFPY/QC\_GP {*} MACHGG) + \\
+\Sexpr{round(cfss[4], 5)} {*} bf(DIFFPZ/QC\_GP) +\\
+\Sexpr{format(cfsf[1],digits=5,nsmall=4)} {*} cf(DIFPY/QC\_GP) +\\
+\Sexpr{format(cfsf[2],digits=5,nsmall=4)} {*} cf(DIFFPY/QC\_GP{*}MACHGG)
++\\
+\Sexpr{format(cfsf[3],digits=5,nsmall=4)} {*} cf(DIFFPZ/QC\_GP) 
+\item [{\textbf{QP\_GP:}}] \Sexpr{format(cftS[1], digits=5, nsmall=4)}
++ \\
+bf(QRG) {*} (\Sexpr{round(cftS[2], 5)} + \Sexpr{round(cftS[3], 5)}
+{*} bf(MACHGG) + \\
+\Sexpr{round(cftS[4], 5)} {*} bf(QRG)) +\\
+bf(ARG) {*} (\Sexpr{round(cftS[5], 5)} + \Sexpr{round(cftS[7], 5)}
+{*} bf(ARG) + \Sexpr{round(cftS[8], 5)} {*} bf(MACHGG)) +\\
+\Sexpr{round(cftS[6], 5)} {*} bf(MACHGG) +\\
+cf(QRG) {*} (\Sexpr{round(cftF[1], 5)} + \Sexpr{round(cftF[2], 5)}
+{*} cf(MACHGG) + \\
+\Sexpr{round(cftF[3], 5)} {*} cf(QRG)) +\\
+cf(ARG) {*} (\Sexpr{round(cftF[4], 5)} + \Sexpr{round(cftF[6], 5)}
+{*} cf(ARG) + \Sexpr{round(cftF[7], 5)} {*} cf(MACHGG)) +\\
+\Sexpr{round(cftF[5], 5)} {*} cf(MACHGG)
+\item [{\textbf{MACHG:}}] Calculate from QP\_GP: \\
+\[
+\mathrm{MACHG}=\sqrt{\frac{c_{v}}{R_{a}}((1+\mathrm{QP\_GP})^{R_{a}/c_{p}}-1)}
+\]
+where $c_{p},\,c_{v},\,R_{a}$ are respectively the specific heat
+at constant pressure, specific heat at constant volume, and gas constant
+for air. The appropriate respective values for dry air are \{1004.728,
+717.6631, 287.07\}.
+\item [{\textbf{TASG:}}] Calculate from MACHG and ATX (optionally with
+humidity correction, here and in the calculation of MACHG).
+\item [{\textbf{Wind:}}] Calculate using gust() but with TASG, CVEW\_GP,
+CVNS\_GP, CVSPD\_GP, CPITCH\_GP, CROLL\_GP, CTHDG\_GP, AK\_GP, and
+SS\_GP used in place of the usual variables from the standard wind
+system. This gives a wind measurement that is not dependent on any
+information from the standard system except temperature.
+\end{lyxlist}
+The remaining aspect to discuss in this report is the performance
+of the gust pod at high rate. In Section 5, that discussion will be
+combined with consideration of the standard wind measurements and
+those as modified by using the pitot-static sensor. 
+
+\section{High-Rate Measurements }
+
+There are now four ways to determine the wind vector:
+\begin{enumerate}
+\item Use the standard measurements from the radome, standard pitot tube,
+ambient pressure, and velocity relative to the ground. This is the
+system discussed extensively by \citet{Cooper2016ncartn};
+\item Modify that system by using the airspeed measurement from the new
+pitot-static system;
+\item Calculate the wind from the measurements provided by the gust pod;
+and
+\item Use the Laser Air Motion Sensor. This instrument is not part of the
+SOCRATES instrumentation so it will not be discussed further here,
+but it provided valuable confirmation that the corrections applied
+to the standard measurements of ambient and dynamic pressure remain
+valid as originally determined from the LAMS.
+\end{enumerate}
+The emphasis in this section will be on the high-rate measurements.
+
+\subsection{Constructing the high-rate data.frame}
+
+In this report, to date only the high-rate measurements from the test
+and ferry flights and from research flight \#1 are available to the
+author. The following discussion will be based mostly on the high-rate
+data from research flight \#1. For the purposes of this study, those
+measurements were processed as discussed in Section 3 to incorporate
+the pitot-static sensor into the wind measurements (as new variables
+by using a variable TASTC that is derived from the revised dynamic
+pressure QCTC, the filtered ambient pressure measurement PSFCF, and
+the air temperature ATX. In other regards the wind calculation is
+standard and results in the variables WDTC, WSTC, WITC, UXTC and VYTC
+(analogous to the standard variables WDC, WSC, WIC, UXC and VYC).
+In the base of the gust pod, the algorithm developed in Section 4
+leads similarly to variables WDG, WSG, WIG, UXG and VYG. A processor
+for adding these variables to the original netCDF file is discussed
+in the final section, but for use in this report all those variables
+have been added to a standard high-rate data.frame. The relevant code
+is in the ``getHRdata'' chunk of R code in this program file.
+
+<<getHRdata, include=TRUE, echo=FALSE, cache=TRUE>>=
+
+Flight <- "rf01_hr"  
+Rate <- 25
+Project <- "SOCRATES"
+VarList <- unique (c(VarList, VL, VarNames, 'UXC', 'VYC'))
+fname = sprintf("%s%s/%s%s.nc", Directory, Project, Project, Flight)
+DataHR <- getNetCDF(sprintf('%s%s/%srf01_hr.nc', Directory, Project, Project), VarList, Start=34500, End=51500)
+DataHR$PSFF <- zoo::na.approx(as.vector(DataHR$PSXC), maxgap=1000*Rate, na.rm=FALSE)
+meanPSFF <- mean(DataHR$PSFF, na.rm=TRUE)
+DataHR$PSFF[is.na(DataHR$PSFF)] <- meanPSFF
+DataHR$PSFF <- signal::filtfilt (signal::butter (3, 2/(2*25), type='low'), DataHR$PSFF)
+DataHR$PTOT2 <- DataHR$QCTF + DataHR$PSTF
+DataHR$QCTC <- DataHR$PTOT2 - DataHR$PSFF
+DataHR$TASTC <- TrueAirspeed (MachNumber(DataHR$PSFF, DataHR$QCTC), DataHR$ATX, DataHR$EWX / DataHR$PSXC)
+DataW <- DataHR
+DataW$TASX <- DataHR$TASTC
+DataW <- WindProcessor(DataW)
+DataHR$WDTC <- DataW$WDN
+DataHR$WSTC <- DataW$WSN
+DataHR$WITC <- DataW$WIN
+hdg <- DataHR$THDG * Cradeg 
+wd <- DataHR$WDTC * Cradeg + pi 
+DataHR$UXTC <- DataHR$WSTC * (sin(hdg) * sin(wd) + cos(hdg) * cos(wd)) 
+hdg <- hdg - pi/2 
+DataHR$VYTC <- DataHR$WSTC * (sin(hdg) * sin(wd) + cos(hdg) * cos(wd))
+## Finished with pitot-static; next add the gust-pod variables
+D <- DataHR    ## (for simplicity in typing)
+D$QR <- D$ADIFR / D$QCF
+D$QR[D$QCF < 20] <- NA
+D$QR[is.infinite(D$QR)] <- NA
+D$M <- MachNumber (D$PSF, D$QCF)
+D$WICS <- SmoothInterp (D$WIC)
+CutoffPeriod <- 600 * Rate
+D$QRS <- zoo::na.approx (as.vector(D$QR), maxgap=1000*Rate, na.rm = FALSE)
+D$QRS[is.na(D$QRS)] <- 0
+D$QRS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QRS)
+D$QRF <-  D$QR - D$QRS
+D$QCFS <- zoo::na.approx (as.vector(D$QCF), maxgap=1000*Rate, na.rm = FALSE)
+D$QCFS[is.na(D$QCFS)] <- 0
+D$QCFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QCFS)
+D$MS <- zoo::na.approx (as.vector(D$M), maxgap=1000*Rate, na.rm = FALSE)
+D$MS[is.na(D$MS)] <- 0
+D$MS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$MS)
+D$MF <-  D$M - D$MS
+DataHR <- D
+rm('D')
+diffP <- c(rep(0, nrow(DataHR)), DataHR$BDIF_GP, DataHR$ADIF_GP)  ## check signs!!
+dim(diffP) <- c(nrow(DataHR), 3)
+DF <- data.frame(ROLL=DataHR$CROLL_GP, PITCH=DataHR$CPITCH_GP, THDG=DataHR$CTHDG_GP)
+diffPl <- Ranadu::XformLA (DF, diffP)  ## DF contains gustpod attitude angles
+diffPa <- Ranadu::XformLA (DataHR, diffPl, .inverse=TRUE)  # pressure vector in a-frame
+DataHR$AK <- cff * DataHR$QRF + cfs[1] + cfs[2] * DataHR$QRS + cfs[3] * DataHR$QCFS
+DataHR$DIFFPX <- diffPa[,1]
+DataHR$DIFFPY <- diffPa[,2]
+DataHR$DIFFPZ <- diffPa[,3]
+DataHR$MACHG <- MachNumber(DataHR$PS_GP, DataHR$QC_GP)
+## as for AK, decompose into slow and fast components
+DataHR$AKS <- zoo::na.approx (as.vector(DataHR$AK), maxgap=1000, na.rm=FALSE)
+DataHR$AKS[is.na(DataHR$AKS)] <- 0
+DataHR$AKS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), DataHR$AKS)
+DataHR$AKF <- DataHR$AK - DataHR$AKS
+DataHR$SSRDS <- zoo::na.approx (as.vector(DataHR$SSRD), maxgap=1000, na.rm=FALSE)
+DataHR$SSRDS[is.na(DataHR$SSRDS)] <- 0
+DataHR$SSRDS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), DataHR$SSRDS)
+DataHR$SSRDF <- DataHR$SSRD - DataHR$SSRDS
+DataHR$DV1 <- with(DataHR, DIFFPZ / QC_GP)
+DataHR$DV2 <- with(DataHR, (DIFFPZ / QC_GP) * MACHG)
+DataHR$DV3 <- with(DataHR, DIFFPY / QC_GP)
+DataHR$DV4 <- with(DataHR, (DIFFPZ / QC_GP)^2)
+DataHR$DVS1 <- DataHR$DV3
+DataHR$DVS2 <- with(DataHR, MACHG * DIFFPY / QC_GP)
+DataHR$DVS3 <- DataHR$DV1
+DataHR$DV1S <- zoo::na.approx (as.vector(DataHR$DV1), maxgap=1000, na.rm=FALSE)
+meanDV1 <- mean(DataHR$DV1, na.rm=TRUE)
+DataHR$DV1S[is.na(DataHR$DV1S)] <- meanDV1
+DataHR$DV1S <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), DataHR$DV1S)
+DataHR$DV1F <- DataHR$DV1 - DataHR$DV1S
+DataHR$DV2S <- zoo::na.approx (as.vector(DataHR$DV2), maxgap=1000, na.rm=FALSE)
+meanDV2 <- mean(DataHR$DV2, na.rm=TRUE)
+DataHR$DV2S[is.na(DataHR$DV2S)] <- meanDV2
+DataHR$DV2S <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), DataHR$DV2S)
+DataHR$DV2F <- DataHR$DV2 - DataHR$DV2S
+DataHR$DV3S <- zoo::na.approx (as.vector(DataHR$DV3), maxgap=1000, na.rm=FALSE)
+meanDV3 <- mean(DataHR$DV3, na.rm=TRUE)
+DataHR$DV3S[is.na(DataHR$DV3S)] <- meanDV3
+DataHR$DV3S <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), DataHR$DV3S)
+DataHR$DV3F <- DataHR$DV3 - DataHR$DV3S
+DataHR$DV4S <- zoo::na.approx (as.vector(DataHR$DV4), maxgap=1000, na.rm=FALSE)
+meanDV4 <- mean(DataHR$DV4, na.rm=TRUE)
+DataHR$DV4S[is.na(DataHR$DV4S)] <- meanDV4
+DataHR$DV4S <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), DataHR$DV4S)
+DataHR$DV4F <- DataHR$DV4 - DataHR$DV4S
+DataHR$DVS1S <- DataHR$DV3S
+DataHR$DVS1F <- DataHR$DV3F
+DataHR$DVS2S <- zoo::na.approx(as.vector(DataHR$DVS2), maxgap=1000, na.rm=FALSE)
+meanDVS2 <- mean(DataHR$DVS2, na.rm=TRUE)
+DataHR$DVS2S[is.na(DataHR$DVS2S)] <- meanDVS2
+DataHR$DVS2S <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), DataHR$DVS2S)
+DataHR$DVS2F <- DataHR$DVS2 - DataHR$DVS2S
+DataHR$DVS3S <- DataHR$DV1S
+DataHR$DVS3F <- DataHR$DV1F
+DataHR$AK_GPS <- with(DataHR, cfas[1] + cfas[2] * DV1S + cfas[3] * DV2S + cfas[4] * DV3S + cfas[5] * DV4S)
+DataHR$AK_GPF <- with(DataHR, cfaf[1] * DV1F + cfaf[2] * DV2F + cfaf[3] * DV3F)
+DataHR$AK_GP <- DataHR$AK_GPS + DataHR$AK_GPF
+DataHR$SS_GPS <- with(DataHR, cfss[1] + cfss[2] * DVS1S + cfss[3] * DVS2S + cfss[4] * DVS3S)
+DataHR$SS_GPF <- with(DataHR, cfsf[1] * DVS1F + cfsf[2] * DVS2F + cfsf[3] * DVS3F)
+DataHR$SS_GP <- DataHR$SS_GPS + DataHR$SS_GPF
+DataHR$QR <- DataHR$QCXC / DataHR$PSXC
+######################################
+DataHR$QRG <- DataHR$QC_GP / DataHR$PS_GP
+DataHR$DVT2 <- DataHR$QRG
+DataHR$MACHG <- MachNumber(DataHR$PS_GP, DataHR$QC_GP)
+DataHR$DVT3 <- DataHR$MACHG * DataHR$DVT2
+DataHR$ARG <- DataHR$ADIF_GP / DataHR$QC_GP
+DataHR$DVT4 <- DataHR$QRG^2
+DataHR$DVT5 <- DataHR$ARG
+DataHR$DVT6 <- DataHR$MACHG
+DataHR$DVT7 <- DataHR$ARG^2
+DataHR$DVT8 <- DataHR$MACHG * DataHR$ARG
+for (V in c('DVT2', 'DVT3', 'DVT4', 'DVT5', 'DVT6', 'DVT7', 'DVT8')) {
+  VS <- sprintf ('%sS', V)
+  VF <- sprintf ('%sF', V)
+  DataHR[, VS] <- SplitDV (DataHR[, V], 60*25)
+  DataHR[, VF] <- DataHR[, V] - DataHR[, VS]
+}
+DataHR$QRPS <- with(DataHR, cftS[1] + cftS[2]*DVT2S + cftS[3]*DVT3S + cftS[4]*DVT4S +
+                      cftS[5]*DVT5S + cftS[6]*DVT6S + cftS[7]*DVT7S + cftS[8]*DVT8S)
+DataHR$QRPF <- with(DataHR, cftF[1]*DVT2F+cftF[2]*DVT3F+cftF[3]*DVT4F +
+                      cftF[4]*DVT5F+cftF[5]*DVT6F+cftF[6]*DVT7F+cftF[7]*DVT8F)
+# DataHR$QRP <- with(DataHR, cft[1]+cft[2]*QRG+cft[3]*MACHG*QRG+cft[4]*QRG^2+cft[5]*ARG+cft[6]*MACHG+
+#                         cft[7]*ARG^2+cft[8]*MACHG*ARG)
+DataHR$QRP <- DataHR$QRPS + DataHR$QRPF
+######################################
+## replace MACHG with new value:
+DataHR$MACHG <- MachNumber(1, DataHR$QRP)
+DataHR$TASG <- TrueAirspeed(DataHR$MACHG, DataHR$ATX, DataHR$EWX / DataHR$PSXC)
+## have all variables; do wind calculation
+DataW <- DataHR
+DataW$TASX <- DataHR$TASG
+DataW$ATTACK <- DataHR$AK_GP
+DataW$SSLIP <- DataHR$SS_GP
+# DataW$PITCH <- DataHR$CPITCH_GP  ## don't want these; already to a-frame
+DataW$VEW <- DataHR$CVEW_GP
+DataW$VNS <- DataHR$CVNS_GP
+DataW$GGVSPD <- DataHR$CVSPD_GP
+DataW <- WindProcessor(DataW, CompF=FALSE)
+DataHR$WDG <- DataW$WDN
+DataHR$WSG <- DataW$WSN
+DataHR$WIG <- DataW$WIN
+hdg <- DataHR$THDG * Cradeg 
+wd <- DataHR$WDG * Cradeg + pi 
+DataHR$UXG <- DataHR$WSG * (sin(hdg) * sin(wd) + cos(hdg) * cos(wd)) 
+hdg <- hdg - pi/2 
+DataHR$VYG <- DataHR$WSG * (sin(hdg) * sin(wd) + cos(hdg) * cos(wd))
+DataW <- DataHR
+DataW$ATTACK <- DataHR$AK
+DataW <- WindProcessor(DataW, CompF=FALSE)
+DataHR$WIY <- DataW$WIN
+rm('DataW')
+
+@
+
+<<addWind, echo=FALSE, include=TRUE>>=
+
+source('chunks/AddWind.R')
+
+@
+
+Figures \ref{fig:HRplots} and \ref{fig:HRUVplots} show comparisons
+among the three measurements of the wind vector. All are in very good
+agreement, although there are occasional spikes in all that will be
+a problem for calculations of the spectral variance. 
+
+<<HRplots, include=TRUE, echo=FALSE, fig.cap='Comparisons of the wind components from the standard system (suffix C), the standard system modified to use the pitot-static sensor for airspeed (suffix TC), and the gust pod (suffix G). The vertical wind measurements have a 60-s smoothing function applied because otherwise the noise obscures the differences, and for vertical wind the added variable WIY (cyan color) is the vertical wind that uses the angle-of-attack from the complementary-filter algorithm. Data from high-rate processing for SOCRATES research flight 1, 4:10:00 -- 5:00:00 UTC.'>>=
+
+DataP <- DataHR[setRange(DataHR, 41000, 50000),]
+layout(matrix(1:3, ncol=1), widths = 1, heights = c(5,5,6))
+op <- par (mar=c(2,4,1,1)+0.1, oma=c(1.1,0,0,0))
+with(DataP, plotWAC(data.frame(Time, WDTC, WDG, WDC), ylab='wind direction [deg.]', legend.position='topright'))
+with(DataP, plotWAC(data.frame(Time, WSTC, WSG, WSC), ylab='wind speed [m/s]', legend.position='topright'))
+op <- par (mar=c(5,4,1,1)+0.1)
+WIC <- SmoothInterp(DataP$WIC)
+WITC <- SmoothInterp(DataP$WITC)
+WIG <- SmoothInterp(DataP$WIG)
+WIY <- SmoothInterp(DataP$WIY)
+plotWAC(data.frame(DataP$Time, WITC, WIG, WIC, WIY), ylab='vertical wind [m/s', ylim=c(-2,2), legend.position='topright') 
+
+@
+
+<<HRUVplots, include=TRUE, echo=FALSE, fig.cap='The lateral (VY) and longitudinal (UX) components of the horizontal wind for the same period shown in the previous figure.'>>=
+
+layout(matrix(1:2, ncol=1), widths=1, heights=c(5,6))
+op <- par (mar=c(2,4,1,1)+0.1, oma=c(1.1,0,0,0))
+with(DataP, plotWAC(data.frame(Time, UXTC, UXG, UXC), ylab='long. component [m/s]'))
+op <- par (mar=c(5,4,1,1)+0.1)
+with(DataP, plotWAC(data.frame(Time, VYTC, VYG, VYC), ylab='lateral component [m/s]'))
+layout(matrix(1:1, ncol=1), widths=1, heights=5)
+op <- par (mar=c(5,4,1,1)+0.1, oma=c(1.1,0,0,0))
+
+@
+
+\subsection{Removing spikes}
+
+Spikes are a prevalent problem in the high-rate data from SOCRATES
+flight \#1, and they will add significant noise to the measured variance
+spectra, so their removal is an important requirement before the spectra
+are constructed. The method used is in ``removeSpikes.R'' that is
+soon to be added to the Ranadu package but for now is a separate file
+in the ``Ranadu/NewWork'' directory. The algorithm used is to calculate
+a rolling mean and rolling standard deviation for the supplied variable,
+set any measurements that depart from the rolling mean by more than
+``sdLimit'' standard deviations (default value is sdLimit=4) as
+missing, and then interpolate to fill in missing values. This removes
+most of the visibly obvious spikes, but whatever causes the spikes
+may also produce lower-amplitude fluctuations that are not removed
+by this algorithm, so it is important to determine the source of the
+spikes. This is unresolved at present (at least to the author's knowledge).
+
+<<removeSpikes, include=TRUE, echo=FALSE>>=
+
+Var <- c('WIC', 'WIY', 'WIG', 'WITC', 'UXC', 'VYC', 'UXG', 'VYG', 'UXTC', 'VYTC', 'TASX', 'TASG', 'TASTC')
+for (V in Var) {
+  DataP[,V] <- removeSpikes(DataP[,V], sdLimit=4)
+}
+
+@
+
+\subsection{Lateral variance spectra}
+
+<<VYspecHR, include=TRUE, echo=FALSE, fig.cap='Variance spectra for measurements of the lateral horizontal wind from SOCRATES flight 1, 4:10:00 -- 5:00:00, a region with some mild turbulence.'>>=
+
+g <- VSpec(DataP, 'VYC', smoothBins=50)
+g <- VSpec(DataP, 'VYG', smoothBins=50, ADD=g)
+VSpec(DataP, 'VYTC', smoothBins=50, ADD=g) + theme_WAC()
+
+@
+
+<<WIspecHR, include=TRUE, echo=FALSE, fig.cap='Variance spectra for measurements of the vertical wind from SOCRATES flight 1, for the same region as the previous figure.'>>=
+
+g <- VSpec(DataP, 'WIC', smoothBins=50)
+g <- VSpec(DataP, 'WIG', smoothBins=50, ADD=g)
+VSpec(DataP, 'WITC', smoothBins=50, ADD=g) + theme_WAC()
+
+@
+
+Figure \ref{fig:VYspecHR} shows the three measurements of the spectral
+variance\footnote{The orange lines indicate the expected -2/3 slope for the frequency-weighted
+spectrum, with factor-of-ten difference in the corresponding eddy
+dissipate rate between successive lines. The heavy dotted line corresponds
+to an eddy dissipation rate of $10^{-4}\,\mathrm{m}^{2}\mathrm{s}^{-3}$.
+In plots of the longitudinal spectrum (as below for UX), the reference
+lines are adjusted for the expected 4/3 ratio between longitudinal
+and lateral spectra.} of the lateral horizontal wind component ``VY''. All three are
+reasonable and VYC and VYTC (the standard variable and that based
+on the pitot-static airspeed) are consistent, but there appears to
+be some deficit in the spectral variance for VYG around 0.3~Hz.\footnote{A conjecture is that, because this is a frequency where the aircraft
+responds strongly to changes in airflow, there might be some residual
+effect on airflow distortion in this frequency range that dampens
+the response to real sideslip fluctuations.} All are in reasonable agreement above 1 Hz. For the vertical wind
+(also a lateral component and so expected to show the same spectral
+variance as VY), the spectra are shown in Fig.\-\ref{fig:WIspecHR}.
+The spectrum from the gust pod (variable WIG) is significantly below
+that from the other two measurements for frequencies about about 0.3~Hz
+and is significantly different from the spectral variance of VY in
+this region, so it appears to be suspect. The airflow distortions
+may suppress response to vertical wind at high frequency. This result
+differs from that in project DEEPWAVE, where the spectral variance
+of the vertical wind appeared to be very good and consistent with
+the spectrum of VY\@. The major difference in aircraft configuration
+is the presence of the large pods in SOCRATES, so it may be that the
+resulting airflow distortion interferes with the ability of the gust
+pod to measure high-frequency components of the vertical wind. The
+other two measurements of vertical wind (WIY and WITC) appear to be
+too high for frequencies above about 3 Hz, and this apparent problem
+is still greater without spike removal. The spectrum for WIC is the
+same. This is an unfortunate weakness in the measurements, and this
+extended effort to use the new measurements has not produced an improvement
+in the vertical wind. The departure from expected shape above 3 Hz
+does not appear to be a simple random-noise spectrum, which would
+be expected to increase linearly with frequency in this plot, so it
+is unclear what causes the departure from expected shape. 
+
+<<highTurb, include=TRUE, echo=FALSE, fig.cap='Variance spectra for lateral wind components (WI=vertical and VY=starboard) for the period from 4:56:00 -- 5:01:00 UTC on SOCRATES flight 8.'>>=
+
+DX8 <- getNetCDF(sprintf('%s%s/%srf08h.nc', Directory, Project, Project), VR, 43500, 52500)
+## remove some spikes
+VS <- c('PSTF', 'QCTF', 'UXC', 'VYC', 'TASX', 'PSXC', 'QC_GP')
+for (V in VS) {
+  DX8[, V] <- removeSpikes(DX8[, V], sdLimit=3)
+}
+DX8 <- AddWind (DX8)
+DT <- DX8[setRange(DX8, 45600, 50100), ]
+g <- VSpec(DT, 'WIC', method='MEM')
+g <- VSpec(DT, 'VYC', method='MEM', ADD=g)
+g <- VSpec(DT, 'VYG', method='MEM', ADD=g)
+VSpec(DT, 'WIG', method='MEM', ADD=g) + theme_WAC()
+rm('DT')
+
+@
+
+The turbulence is relatively mild in this region, with representative
+eddy dissipation rate of about $10^{-5}\,\mathrm{m}^{2}\thinspace\mathrm{s^{-3}}$.
+More turbulent regions lead to spectra with different characteristics
+and different problems. A good example is Flight \#8, 4:56:00 \textendash{}
+5:01:00, where the estimated eddy dissipation rate is about $2\times10^{-3}\mathrm{m}^{2}\thinspace\mathrm{s}^{-3}$.
+In this case, both standard lateral spectra (for WIC and VYC, blue
+and green lines in Fig.~\ref{fig:highTurb}) appear very good and
+consistent with each other, without the suspicious flattening evident
+in Fig.~\ref{fig:WIspecHR}. Also in other cases examined in SOCRATES,
+these lateral variance spectra show the expected high-frequency slope
+and there are no evident problems. Variance spectra for other related
+variables WIY, WITC, VYTC are not distinguishable from those for WIC
+and VYC. However, the gust-pod measurements continue to have problems
+at high frequency. The spectrum for the vertical wind (WIG, brown
+line) is lower than the other measurements, has apparent low intensity
+at high frequency, and is generally not in agreement with other measurements
+for frequencies above about 0.3~Hz. Effects of flow distortion around
+the aircraft apparently affect the ability of this instrument to measure
+high-frequency fluctuations in the vertical wind. The gust-pod measurement
+of lateral wind, VYG, looks better but too high for frequencies above
+about 3~Hz.
+
+\subsection{Longitudinal variance spectra}
+
+<<UXspecHR, include=TRUE, echo=FALSE, fig.cap='Variance spectra similar to those shown in the previous two plots and for the same time interval, but for the longitudinal spectrum UX.'>>=
+
+g <- VSpec(DataP, 'UXC', ae=0.15, smoothBins=50)
+g <- VSpec(DataP, 'UXG', smoothBins=50, ADD=g)
+VSpec(DataP, 'UXTC', smoothBins=50, ADD=g) + theme_WAC()
+
+@
+
+Similar plots of spectral variance for the longitudinal components
+(UX) are shown in Fig.~\ref{fig:UXspecHR}, for same time period
+for which the lateral spectra were shown in Fig.~\ref{fig:VYspecHR}.
+In this case (with moderately low turbulence), the gust-pod measurements
+appear to be biased upward with a high-frequency slope characteristic
+of noise for frequencies above about 1~Hz.\footnote{The calculation of airspeed used the same decomposition into fast
+and slow components as for angles of attack and sideslip, except with
+a cutoff frequency at 1/60~Hz to try to improve the high-frequency
+response, but that did not improve the variance spectra relative to
+a fit that did not use this decomposition.} For this measurement, the pitot-static measurement of airspeed has
+produced a significantly better spectral variance for the frequency
+range above 1~Hz, but even that spectrum shows some flattening above
+about 4\-Hz. This may be a residual effect of whatever is causing
+the frequent spikes in the measurements from this flight or it may
+result from high-frequency flow-distortion effects in the airflow
+approaching the pitot-static sensor, which is close to the aircraft
+skin.
+
+<<longSpecGP, include=TRUE, echo=FALSE, fig.cap='Variance spectra for a region of more intense turbulence, for the longitudinal wind component (UX). UXC is the standard measurement, UCTC is based on the airspeed measured by the pitot-static sensor, and UXG is from the gust pod. Data from SOCRATES research flight 8, 4:56:00 -- 5:01:00 UTC.'>>=
+
+DT <- DX8[setRange(DX8, 45600, 50100), ]
+g <- VSpec(DT, 'UXG', ae=0.15, method='MEM')
+g <- VSpec(DT, 'UXC', method='MEM', ADD=g)
+VSpec(DT, 'UXTC', method='MEM', ADD=g) + theme_WAC()
+rm('DT')
+
+@
+
+For the case with high-intensity turbulence, for which lateral spectra
+were shown in Fig.~\ref{fig:highTurb}, Fig.~\ref{fig:longSpecGP}
+shows the variance spectrum for measurements of the longitudinal component.
+The standard measurement (UXC, green line) produces estimates of spectral
+density that depart from the expected slope above about 1~Hz, reflecting
+the problem arising from sample-line resonance discussed before. The
+new measurement from the pitot-static sensor (UXTC) looks much better
+but still shows indications of noise beginning around 5~Hz. For the
+gust pod (blue line), two features are notable, the 0.5-Hz peak and
+the apparently good performance near the Nyquist limit. The former
+is probably an erroneous effect of the flow-distortion around the
+aircraft and some coupling of that to natural oscillations of the
+aircraft in pitch and heading. The latter effect suggests that, if
+it becomes crucial to some aspect of research, it may be feasible
+to ``blend'' the high-frequency measurements from the gust pod with
+the lower-frequency components of the pitot-static-based measurement
+of longitudinal wind. 
+
+The longitudinal spectra would look much worse without the spike-removal
+procedure discussed in the preceding section, so some of the remaining
+problem may arise from smaller spikes not removed by that algorithm.
+This is another indication that it is important to find and correct
+the source of those spikes, which have been prevalent during SOCRATES.
+
+\section{Summary and Conclusions}
+
+The NCAR Technical Note TN-528+STR (\citet{Cooper2016ncartn}) indicated
+that the estimated standard uncertainty for measurements of wind from
+the NSF/NCAR GV research aircraft are about 0.12~m/s for the vertical
+wind and 0.4~m/s for each component of the vertical wind, but it
+also discussed a problem with measurements of the variance spectrum
+of the longitudinal component of the wind (i.e., along the aircraft
+longitudinal axis) at frequencies above about 1~Hz. The present report
+extends that study in these ways:
+\begin{enumerate}
+\item Measurements from the LAMS were used to confirm that the corrections
+being applied to measurements of ambient and dynamic pressure remained
+valid in Feb.~2017, at the time of the ARISTO-2017 campaign.
+\item Prior to Feb.~2017, a new pitot-static sensor was installed on the
+GV, largely as a result of Dick Friesen's initiative. The purpose
+was to reduce the contamination of the longitudinal-wind measurement
+that results from resonance in the sample lines. That sensor was recorded
+in SOCRATES, so in this report a processing scheme was developed to
+use with that sensor. New measurements of the wind were then calculated
+using the revised airspeed from that sensor. The conclusion of an
+evaluation of those wind measurements is that:
+\begin{enumerate}
+\item At low rate (<0.5 Hz) the measurement of airspeed and hence of wind
+is consistent with the standard system. This result did not rely on
+any calibration to match the standard system because the pitot-static
+tube provides an independent measurement of the total pressure (ambient
+plus dynamic) that agrees with the standard system without calibration. 
+\item At high rate (>0.5 Hz) the variance spectrum of the airspeed or the
+longitudinal component of the wind is in better agreement with the
+expected -5/3 slope up to about 5~Hz, but above that frequency some
+noise is still present in the spectrum. The source of this residual
+noise has not been determined. Despite that deficiency, the longitudinal
+variance spectrum has been improved significantly by the addition
+of the pitot-static tube, and future data processing should be based
+on the dynamic pressure from that sensor.
+\item A separate memo (attached) describes how the measurements from the
+pitot-static sensor can be incorporated into the standard processing
+for the GV\@. A processing scheme to add the new measurements based
+on the pitot-static sensor has been added to the QAtools shiny app.
+For low-rate measurements the new algorithm is trivially simple and
+can be incorporated immediately into standard processing. At high
+rate, it is helpful to apply some filtering to one of the variables
+used, so that may be done best in post-processing for now, although
+the low-rate algorithm could also be used and would usually produce
+an improvement even at high rate.
+\end{enumerate}
+\item The gust pod (based on an 858 probe mounted in a canister under the
+GV wing) was flown in SOCRATES for the first time in conjunction with
+the large underwing pods. They apparently changed the airflow distortion
+ahead of the gust pod so that the earlier processing scheme led to
+some offsets in the measurements (for example changing the airspeed
+calculation by 2 m/s). Therefore a new procedure was developed for
+using the gust pod in this configuration. That procedure then was
+used to calculate wind measurements from the gust pod that are mostly
+independent of those from the radome-based system. These are the significant
+results from study of those measurements of wind from the gust pod:
+\begin{enumerate}
+\item At low rate, measurements of airspeed and of the angles of attack
+and sideslip were consistent with measurements from the standard system,
+so the gust pod provides a useful all-weather backup to that system.
+\item The variance spectra for measurements from the gust pod showed various
+problems that appear associated with airflow distortion. There appears
+to be possible contamination of the longitudinal-wind spectrum at
+frequencies expected for phugoidal or Dutch-roll aerodynamic instabilities.
+These are removed by the standard measuring system, but the distortion
+of airflow around the aircraft may be delayed in ways that could affect
+the airflow at the gust pod. Although this is a conjecture, there
+is a clear problem at around 5 Hz in the longitudinal-wind spectrum
+from the gust pod. The spectral density for the vertical-wind seems
+significantly too low at high frequency. The suggested conclusion
+is that measurements from the gust pod do not lead to useful estimates
+of spectral variance.
+\item A processing scheme was developed to produce measurements of the wind
+vector and the airspeed from the variables that the gust pod measures.
+It appears to be too complex to be worth incorporating into the standard
+processor ``nimbus'' because, to get useful measurements, it was
+necessary to use various transformations among coordinate systems
+and fitting to measurements that are split into complementary low-frequency
+and high-frequency components. A processor to add the wind measurements
+from the gust pod to the standard netCDF files has been incorporated
+into the QAtools shiny app.
+\end{enumerate}
+\item In the 25-Hz netCDF files produced during the field project, there
+are spikes in many of the measurements that do not appear to be real
+and that, unless removed, will contaminate the variance spectra for
+those measurements. For the plots of spectral variance shown in Sect.~5
+of this report a spike-removal algorithm was used to reduce the effects
+of such spikes, but other spikes of lower amplitude may remain and
+contaminate the spectra. Follow-up investigation is needed to determine
+the source of these spikes.
+\end{enumerate}
+
+\section{The Processor}
+
+<<nVarCalc, eval=FALSE>>=
+
+Project <- 'SOCRATES'
+Flight <- 1
+fname <- sprintf ('%s%s/%srf%02d.nc', Directory, Project, Project, Flight)
+fnew <- sub ('.nc', 'Y.nc', fname)
+Z <- file.copy (fname, fnew, overwrite=TRUE)  ## BEWARE: overwrites without warning!!
+## read variables needed for the calculation
+FI <- DataFileInfo (fname, LLrange=FALSE)
+
+## for some old projects:
+if (!('GGVSPD' %in% FI$Variables)) {
+  if ('GGVSPDB' %in% FI$Variables) {
+    VR [which (VR == 'GGVSPD')] <- 'GGVSPDB'
+  } else if ('VSPD_A' %in% FI$Variables) {
+    VR [which (VR == 'GGVSPD')] <- 'VSPD_A'
+  } else if ('VSPD_G' %in% FI$Variables) {
+    VR [which (VR == 'GGVSPD')] <- 'VSPD_G'
+  } else {
+    print ('ERROR: no VSPD variable found')
+    exit()
+  }
+}
+for (Var in VR) {
+  if (!(Var %in% FI$Variables)) {
+    print (sprintf (' required variable %s not found in file %s; skipping...', Var, fname))
+    exit()
+  }
+}
+
+DY <- getNetCDF(fname, VR)
+Data <- AddWind(DY)    ## default adds everything
+
+@
+
+<<newNetCDF, eval=FALSE>>=
+
+source ('chunks/copyAttributes.R')
+
+netCDFfile <- nc_open (fnew, write=TRUE) 
+Dimensions <- attr (Data, "Dimensions")
+Dim <- Dimensions[["Time"]]
+Rate <- 1
+if ("sps25" %in% names (Dimensions)) {
+  Rate <- 25
+  Dim <- list(Dimensions[["sps25"]], Dimensions[["Time"]])
+}
+if ("sps50" %in% names (Dimensions)) {
+  Rate <- 50
+  Dim <- list(Dimensions[["sps50"]], Dimensions[["Time"]])
+}
+DATT <- Data  ## save to ensure that attributes are preserved
+
+## variables to add to the netCDF file:
+VarNew <- c('AKY', 'WIY', 'AK_GP', 'SS_GP', 'WIG', 'WDG', 'WSG', 'TASG', 'UXG', 'VYG', 'ROC', 'TASTC', 'WDTC', 'WSTC', 'WITC', 'UXTC', 'VYTC')
+VarOld <- c('AKRD', 'WIC', 'AKRD', 'SSRD', 'WIC', 'WDC', 'WSC', 'TASX', 'UXC', 'VYC', 'GGVSPD', 'TASX', 'WDC', 'WSC', 'WIC', 'UXC', 'VYC') 
+VarUnits <- c('degrees', 'm/s', 'degrees', 'degrees', 'm/s', 'm/s', 'm/s', 'm/s', 'm/s', 'm/s', 'm/s', 'm/s', 'degrees', 'm/s', 'm/s', 'm/s', 'm/s')
+VarStdName <- c('angle-of-attack, CF', 'vertical wind, CF', 'angle-of-attack, GP', 'sideslip angle, GP', 'vertical wind, GP', 'wind direction, GP', 'wind speed, GP', 'true airspeed, GP', 'wind longitudinal component, GP', 'wind lateral component, GP', 'rate of climb', 'true airspeed, pitot-static', 'wind direction, pitot-static', 'wind speed, pitot-static', 'vertical wind, pitot-static', 'wind longitudinal component, pitot-static', 'wind lateral component, pitot-static')
+VarLongName <- c('angle of attack, complementary-filter',
+                 'vertical wind using comp-filter angle of attack',
+                 'angle of attack from the gustpod',
+                 'sideslip angle from the gustpod',
+                 'vertical wind from the gustpod',
+                 'horizontal wind direction from the gustpod',
+                 'horizontal wind speed from the gustpod',
+                 'true airspeed from the gustpod',
+                 'horizontal wind, longitudinal component, gustpod',
+                 'horizontal wind, lateral component, gustpod',
+                 'rate of climb of the aircraft from pressure',
+                 'true airspeed from the pitot-static sensor',
+                 'wind direction based on the pitot-static airspeed',
+                 'wind speed based on the pitot-static airspeed',
+                 'vertical wind based on TASTC and AKY',
+                 'horizontal wind, longitudinal component, pitot-static',
+                 'horizontal wind, lateral component, pitot-static')
+
+## create the new variables
+varCDF <- list ()
+for (i in 1:length(VarNew)) {
+  print (sprintf ('new-netcdf %d%% done', as.integer(100*(i-1)/length(VarNew))))
+  varCDF[[i]] <- ncvar_def (VarNew[i],  
+                            units=VarUnits[i], 
+                            dim=Dim, 
+                            missval=as.single(-32767.), prec='float', 
+                            longname=VarLongName[i])
+  if (i == 1) {
+    newfile <- ncvar_add (netCDFfile, varCDF[[i]])
+  } else {
+    newfile <- ncvar_add (newfile, varCDF[[i]])
+  }
+  ATV <- ncatt_get (netCDFfile, VarOld[i])
+  copy_attributes (ATV, VarNew[i], newfile)
+  ncatt_put (newfile, VarNew[i], attname="standard_name", 
+             attval=VarStdName[i])
+  if (Rate == 1) {
+    ncvar_put (newfile, varCDF[[i]], Data[, VarNew[i]])
+  } else if (Rate == 25) {
+    ncvar_put (newfile, varCDF[[i]], Data[, VarNew[i]], count=c(25, nrow(Data)/25))
+  }
+}
+nc_close (newfile)
+
+
+
+
+
+@
+
+The transformations from the gust-pod reference frame to the aircraft
+reference frame are involved and likely to need careful check-out
+when implemented, so instead the recommended initial approach is to
+use a separate processor to add these variables to the netCDF files.
+This processor is included in the QAtools shiny app, under the ``Special''
+tab, as an option in the ``Options for Wind'' tab. That tab also
+supports addition of wind variables based on the pitot-static sensor,
+the complementary-filter-based angle of attack and associated vertical
+wind as well as the addition of a high-pass-filtered version of the
+vertical wind. A new file with the suffix ``Y'' added to the name
+(e.g., SOCRATESrf01Y.nc) is created using a copy of the original,
+and these variables are added to that file:
+
+\begin{tabular}{|c|l|>{\centering}m{3cm}|}
+\hline 
+\textbf{New Variable} & \textbf{Description} & \textbf{Reference}\tabularnewline
+\hline 
+\hline 
+AKY & angle-of-attack, complementary-filter algorithm & Eqns.\_(\ref{eq:alpha-fast}), (\ref{eq:alpha-slow})\tabularnewline
+\hline 
+WIY & vertical wind, based on AKY & Sect.~\ref{sec:Summary}\tabularnewline
+\hline 
+ROC & rate of climb of the aircraft, using hydrostatic equation & \citet{Cooper2017ncartn} (Sect. 3.1)\tabularnewline
+\hline 
+AK\_GP & angle-of-attack from the gust pod, in the a-frame & Sect.~\ref{subsec:Calibration-AOA}\tabularnewline
+\hline 
+SS\_GP & sideslip angle from the gust pod, in the a-frame & Eqn.~(\ref{eq:newSSG})\tabularnewline
+\hline 
+WIG & vertical wind calculated using AK\_GP and SS\_GP & \tabularnewline
+\hline 
+WDG & wind direction using AK\_GP and SS\_GP & \tabularnewline
+\hline 
+WSG & wind direction using AK\_GP and SS\_GP & \tabularnewline
+\hline 
+TASG & airspeed calculate from the gust-pod & Eqn.~(\ref{eq:TASG})\tabularnewline
+\hline 
+UXG & wind from the gust pod, longitudinal component & Eqn.~(\ref{subsec:pitot-static-algorithm})\tabularnewline
+\hline 
+VYG & wind from the gust pod, lateral (starboard) component & \tabularnewline
+\hline 
+TASTC & airspeed calculated from the pitot-static sensor & Eqn.~(\ref{subsec:pitot-static-algorithm})\tabularnewline
+\hline 
+WDTC & wind direction based on the pitot-static sensor & \tabularnewline
+\hline 
+WSTC & wind speed based on the pitot-static sensor & \tabularnewline
+\hline 
+WITC & vertical wind based on the pitot-static sensor & \tabularnewline
+\hline 
+UXG & longitudinal wind based on the gust pod & \tabularnewline
+\hline 
+VYG & lateral wind based on the gust pod & \tabularnewline
+\hline 
+UXTC & longitudinal wind component based on TASTC & \tabularnewline
+\hline 
+VYTC & lateral (starboard) wind component based on TASTC & \tabularnewline
+\hline 
+\end{tabular}
+
+Instructions for running this special processor are included in the
+QAtools user guide. See the discussion of the ``Special'' tab. The
+code used for this processing is available as part of the GitHub archive
+for this report; see ``WindInSocrates.Rnw'' and the associated chunk
+``AddWind.R''.
+
+\clearpage{}
+
+\appendix
+
+\section{Reproducibility}
+
+This document is constructed in ways that support duplication of the
+study. The code that generates the plots and implements the processing
+algorithm is incorporated into the same file that generated this document
+via \LaTeX, using principles and techniques described by \citet{Xie2014a}
+as implemented in the R package 'knitr' (\citet{Xie2014b}). The program,
+'WindInSOCRATES.Rnw', is archived on 'GitHub' in the directory at
+\href{https://github.com/WilliamCooper/SocratesQA.git}{this URL}.
+There is some supplemental material in that directory, including the
+workflow document, the bibliography and some code segments saved in
+the ``chunks'' subdirectory. This full directory should be downloaded
+in order to run the program. The calculations use the programming
+language R (\citet{Rlanguage}) and were run within RStudio (\citet{RStudio2012}),
+so this is the most straightforward way to replicate the calculations
+and the generation of this document.
+
+A package named Ranadu, containing ancillary functions, is used extensively
+in the R code. It is available on GitHub as \href{https://github.com/WilliamCooper/Ranadu.git}{https://github.com/WilliamCooper/Ranadu.git}.
+The version used for calculations in this technical note is included
+in the 'zip' archive listed below.
+
+The original files containing the data as produced by the NCAR Earth
+Observing Laboratory, Research Aviation Facility, were in netCDF format
+(cf.~\href{http://www.unidata.ucar.edu/software/netcdf/}{this URL}),
+but particularly for SOCRATES the files used are preliminary data
+not yet released for general use. The officially released data files
+should be used once they are available. The subset data frames constructed
+from those preliminary netCDF files are saved and can be provided
+by the author, if or when that is consistent with the project data
+policies. The code in the GitHub archive has appropriate 'load' commands
+to read these data files from a subdirectory named 'Data' (/Data or
+\textasciitilde{}/Data or /home/Data) but this is not part of the
+GitHub repository because it is too large to be appropriate there.
+To reproduce this research, those data files have to be transferred
+separately from the NCAR HPSS to the 'Data' directory. Some use has
+been made of attributes assigned to the data.frames and the variables
+in those data.frames. All the attributes from the original netCDF
+files have been transferred, so there is a record of how the original
+data were processed, for example recording calibration coefficients
+and processing chains for the variables. Once the data.frames are
+loaded into R, these attributes can be viewed and provide additional
+documentation of what data were used. Key information like the processing
+date, the program version that produced the archive, and the selection
+of primary variables for various measurements thus is preserved.
+
+(See the related list of project components on the next page.)
+
+\clearpage{}
+
+\begin{tabular}{ll}
+\textsf{\textsc{\textcolor{blue}{Project:}}}  & WindInSOCRATES\tabularnewline
+\textsf{\textsc{\textcolor{blue}{Archive package:}}}  & \href{https://github.com/WilliamCooper/GustPod/blob/master/AddingGustPodSocrates.zip}{WindInSOCRATES.zip}\tabularnewline
+\textsf{\textsc{\textcolor{blue}{Contains:}}}  & attachment list below\tabularnewline
+\textsf{\textsc{\textcolor{blue}{Program:}}}  & \href{https://github.com/WilliamCooper/GustPod/blob/master/WindInSOCRATES.Rnw}{WindInSOCRATES.Rnw}\tabularnewline
+\textsf{\textsc{\textcolor{blue}{Special Data Files:}}}  & AKRDdata.Rdata\tabularnewline
+\textsf{\textsc{\textcolor{blue}{Workflow Document:}}}  & \href{https://github.com/WilliamCooper/GustPod/blob/master/WorkflowWindInSOCRATES.pdf}{WorkflowWindInSOCRATES.pdf}\tabularnewline
+\textsf{\textsc{\textcolor{blue}{Git:}}}  & \href{https://github.com/WilliamCooper/SocratesQA.git}{https://github.com/WilliamCooper/SocratesQA.git}\tabularnewline
+\end{tabular}
+
+\attachm{WindInSOCRATES.Rnw\\
+WindInSOCRATES.pdf\\
+NoteReSOCRATESwindProcessing.pdf\\
+WorkflowWindInSOCRATES.pdf\\
+WAC.bib\\
+chunks/{*}\\
+SessionInfo}
+
+\clearpage
+%\phantomsection \addcontentsline{toc}{section}{References}
+
+\label{sec:bibliography} 
+
+\bibliographystyle{plainnat}
+\bibliography{WAC}
+
+%\centerline{-- Blank Page, End of this Technical Report --}
+\vfill\eject
+\clearpage
+%\addcontentsline{toc}{section}{End}
+
+<<make-zip-archive, INCLUDE=TRUE, eval=FALSE>>=
+
+cat (toLatex(sessionInfo()), file="SessionInfo") 
+system (sprintf("zip WindInSOCRATES.zip WindInSOCRATES.Rnw WindInSOCRATES.pdf NoteReSOCRATESwindProcessing.pdf WorkflowWindInSOCRATES.pdf WAC.bib ./chunks/* SessionInfo"))
+
+@ 
+
+
+\end{document}

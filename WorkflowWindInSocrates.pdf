@@ -1,0 +1,1168 @@
+#LyX 2.2 created this file. For more info see http://www.lyx.org/
+\lyxformat 508
+\begin_document
+\begin_header
+\save_transient_properties true
+\origin unavailable
+\textclass report
+\begin_preamble
+\input colordvi
+\usepackage{color}
+\fancyhead{}
+\fancyfoot[CE,CO]{}
+\newtoks{\addressee} \global\addressee={}
+\newdimen\longindent \longindent=3.5truein
+\fancyhead[L]{Memo to: \the\addressee \\ \datetoday \\ Page \thepage \hfill}
+\renewcommand{\headrulewidth}{0.0pt}
+\newenvironment{lyxlist}[1]
+{\begin{list}{}
+{\settowidth{\labelwidth}{#1}
+\setlength{\leftmargin}{\labelwidth}
+\addtolength{\leftmargin}{\labelsep}
+\renewcommand{\makelabel}[1]{##1\hfil}}}
+{\end{list}}
+\newcommand{\datetoday}{\number\day\space
+     \ifcase\month\or January\or February\or March\or April\or May\or
+     June\or July\or August\or September\or October\or November\or
+     December\fi
+     \space\number\year}
+\newcommand{\EOLmemo}{\null \vskip-1.5truein
+{\raggedright \textsf{\textsc{\large \textcolor{blue}{Earth Observing Laboratory}}}}\par
+{\raggedright \textsf{\textsl{\textcolor{blue}{Memorandum:}}}} \par \vskip6pt
+{\color{blue}{\hrule}}\par
+\vskip0.3truein \leftline{\hskip \longindent \datetoday} \vskip0.2truein
+\thispagestyle{empty}}
+\newcommand{\attachm}[1]{\begin{lyxlist}{Attachments:00}
+\item [Attachments:] {#1}
+\end{lyxlist}}
+\newcommand{\cc}[1]{\begin{lyxlist}{Attachments:00}
+\item [cc:] {#1}
+\end{lyxlist}}
+\newcommand{\attach}[1]{\begin{lyxlist}{Attachments:00}
+\item [Attachment:] {#1}
+\end{lyxlist}}
+%usage: \encl{A\\B\\C} or \cc{ma,e1\\name2\\name3}
+\end_preamble
+\use_default_options false
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding default
+\fontencoding global
+\font_roman "times" "default"
+\font_sans "default" "default"
+\font_typewriter "default" "default"
+\font_math "auto" "auto"
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100 100
+\font_tt_scale 100 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize letterpaper
+\use_geometry true
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 0
+\use_package mathdots 0
+\use_package mathtools 1
+\use_package mhchem 0
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\leftmargin 2.54cm
+\topmargin 3.54cm
+\rightmargin 2.54cm
+\bottommargin 2.54cm
+\headheight 1cm
+\headsep 2cm
+\footskip 0.5cm
+\secnumdepth 2
+\tocdepth 2
+\paragraph_separation skip
+\defskip medskip
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle fancy
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+EOLmemo 
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+
+\backslash
+global
+\backslash
+addressee={WindInSOCRATES file}% change "File" to the "To:" name
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Tabular
+<lyxtabular version="3" rows="3" columns="2">
+<features tabularvalignment="middle">
+<column alignment="left" valignment="top" width="0pt">
+<column alignment="left" valignment="top" width="0pt">
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family sans
+\shape smallcaps
+\color blue
+To:
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+the
+\backslash
+addressee
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+
+\family sans
+\shape smallcaps
+\color blue
+From:
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Al Cooper
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ 
+\family sans
+\shape smallcaps
+\color blue
+Subject:
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Workflow for WindInSOCRATES.Rnw
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+
+\backslash
+bigskip
+\end_layout
+
+\end_inset
+
+
+\begin_inset Separator latexpar
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+This document contains a reasonably detailed description of the development
+ of algorithms for processing data from the pitot-static sensor and the
+ gust pod on the GV during SOCRATES\SpecialChar endofsentence
+ That development does not need much
+ elaboration in this document, but some functions were developed in the
+ process of constructing this document and some supporting explanation will
+ help anyone wanting to duplicate or extend this work to understand how
+ they operate.
+ This workflow therefore focuses mostly on those functions and a few related
+ aspects like the sources of data used in the report.
+\end_layout
+
+\begin_layout Section*
+Sources of Data
+\end_layout
+
+\begin_layout Standard
+At this time, only the data files produced in the field during the SOCRATES
+ project are available.
+ These are labeled as 
+\begin_inset Quotes eld
+\end_inset
+
+Preliminary
+\begin_inset Quotes erd
+\end_inset
+
+ and should not be used for final analyses, so it will be important to revisit
+ this analysis when final production files are available.
+ In the meantime, to facilitate reproducibility, subset data files as used
+ by this program are saved in the EOL directory ~cooperw/RStudio/Reprocessing,
+ with the names AKRDdata.Rdata, AKRDforSOCRATES.Rdata, 
+\begin_inset Newline newline
+\end_inset
+
+DataM.Rdata, and AKRD-fit-coef.Rdata.
+ These files are too large to include in the GitHub repository, and EOL
+ data-access rules prevent that until the data are released for public access
+ so only internal-to-EOL personnel with responsibility for data processing
+ for the project should use these files until they are released in 
+\begin_inset Quotes eld
+\end_inset
+
+Production
+\begin_inset Quotes erd
+\end_inset
+
+ format..
+ The program has the code to reconstruct these files from the temporary
+ EOL data repository (/scr/raf_data/SOCRATES, etc.), and later could do so
+ from the released data files.
+ The data files may change as EOL personnel review them and correct errors
+ in or make changes in processing (e.g., perhaps by reducing the presence
+ of spikes in the high-rate data that affect variance spectra); that is
+ one reason for caution when using these data files.
+\end_layout
+
+\begin_layout Section*
+Special Functions
+\end_layout
+
+\begin_layout Standard
+Some functions were isolated to the 'chunks' directory because they were
+ expected to be of further use, for example by processing routines that
+ implement the algorithms recommended in the 
+\begin_inset Quotes eld
+\end_inset
+
+WindInSOCRATES
+\begin_inset Quotes erd
+\end_inset
+
+ report.
+ Some will be incorporated into the 
+\begin_inset Quotes eld
+\end_inset
+
+Ranadu
+\begin_inset Quotes erd
+\end_inset
+
+ package of R routines in the future, and others are re-used in the 
+\begin_inset Quotes eld
+\end_inset
+
+QAtools
+\begin_inset Quotes erd
+\end_inset
+
+ shiny app that provides temporary data processing during and shortly after
+ the field project for quality assessment.
+ 
+\end_layout
+
+\begin_layout Subsubsection*
+VSpec(.data, .Variable)
+\end_layout
+
+\begin_layout Standard
+Plots of spectral variance (often called 
+\begin_inset Quotes eld
+\end_inset
+
+variance spectra
+\begin_inset Quotes erd
+\end_inset
+
+ here) are used extensively in this report, so a separate function was used
+ to facilitate construction of those plots.
+ In its simplest form, 
+\begin_inset Quotes eld
+\end_inset
+
+VSpec
+\begin_inset Quotes erd
+\end_inset
+
+ constructs a frequency-weighted variance spectrum from a single variable
+ 
+\begin_inset Quotes eld
+\end_inset
+
+.Variable
+\begin_inset Quotes erd
+\end_inset
+
+ contained in a supplied data.frame (
+\begin_inset Quotes eld
+\end_inset
+
+.data
+\begin_inset Quotes erd
+\end_inset
+
+) and returns a 
+\begin_inset Quotes eld
+\end_inset
+
+ggplot2
+\begin_inset Quotes erd
+\end_inset
+
+ plot specification suitable for printing.
+ The returned specification can also be saved so that subsequent calls can
+ add additional spectra to the plot.
+ This usage would follow these forms:
+\end_layout
+
+\begin_layout LyX-Code
+VSpec(Data, 'TASX')    ## a single spectrum
+\end_layout
+
+\begin_layout LyX-Code
+## for three spectra on one plot:
+\end_layout
+
+\begin_layout LyX-Code
+g <- VSpec (Data, 'QCF')
+\end_layout
+
+\begin_layout LyX-Code
+g <- VSpec (Data, 'QCTC', ADD=g)
+\end_layout
+
+\begin_layout LyX-Code
+VSpec (Data, 'QC_GP', ADD=g)
+\end_layout
+
+\begin_layout Standard
+A set of default specifications will be used in that case.
+ A description of the available parameters and options is contained in the
+ header information for the function.
+ It is planned that this function will be included in 
+\begin_inset Quotes eld
+\end_inset
+
+Ranadu
+\begin_inset Quotes erd
+\end_inset
+
+, at which time the normal help command for the function (
+\begin_inset Quotes eld
+\end_inset
+
+?Ranadu::VSpec) will provide information on the options and defaults.
+ In the meantime, the following will serve as a partial description of the
+ function:
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+.data
+\begin_inset Quotes erd
+\end_inset
+
+ must be a data.frame containing the variable 
+\begin_inset Quotes eld
+\end_inset
+
+.Variable
+\begin_inset Quotes erd
+\end_inset
+
+ as one among possibly many columns.
+ The data.frame must also contain the 
+\begin_inset Quotes eld
+\end_inset
+
+Time
+\begin_inset Quotes erd
+\end_inset
+
+ variable and should have a 
+\begin_inset Quotes eld
+\end_inset
+
+Rate
+\begin_inset Quotes erd
+\end_inset
+
+ attribute; this is the case for all data.frames constructed by Ranadu::getNetCDF.
+ 
+\end_layout
+
+\begin_layout Itemize
+\begin_inset Quotes eld
+\end_inset
+
+.Variable
+\begin_inset Quotes erd
+\end_inset
+
+ should be specified as a character variable containing the name of the
+ variable (e.g., .Variable='TASX')
+\end_layout
+
+\begin_layout Itemize
+The default variance spectrum is constructed using the 
+\begin_inset Quotes eld
+\end_inset
+
+spectrum()
+\begin_inset Quotes erd
+\end_inset
+
+ function of R\SpecialChar endofsentence
+ This function accepts a smoothing argument named 
+\begin_inset Quotes eld
+\end_inset
+
+span
+\begin_inset Quotes erd
+\end_inset
+
+, with a default value in VSpec() of 49.
+ This can be changed by setting the calling argument via spans=NewValue.
+ In effect, centered-average values of 
+\begin_inset Quotes eld
+\end_inset
+
+spans
+\begin_inset Quotes erd
+\end_inset
+
+ length are averaged to produce a smooth spectrum, so larger numbers produce
+ more smoothing.
+\end_layout
+
+\begin_layout Itemize
+The routine will also produce a 
+\begin_inset Quotes eld
+\end_inset
+
+maximum entropy method
+\begin_inset Quotes erd
+\end_inset
+
+ (MEM) spectrum if the 
+\begin_inset Quotes eld
+\end_inset
+
+type
+\begin_inset Quotes erd
+\end_inset
+
+ argument is set to anything other than 
+\begin_inset Quotes eld
+\end_inset
+
+spectrum
+\begin_inset Quotes erd
+\end_inset
+
+ (the default).
+ In this case, the Ranadu functions memCoef() and memEstimate() are used
+ to construct the spectrum.
+ Two additional arguments are relevant in this case: 
+\begin_inset Quotes eld
+\end_inset
+
+poles
+\begin_inset Quotes erd
+\end_inset
+
+ (the number of poles to use in the MEM estimate), with default value 50,
+ and 
+\begin_inset Quotes eld
+\end_inset
+
+resolution
+\begin_inset Quotes erd
+\end_inset
+
+, which specifies the fraction of the logarithm of the frequency range)
+ between successive evaluations of the MEM estimate of spectral variance,
+ with default value 0.0001 leading to evaluation at 10,000 discrete frequencies.
+ A small number of poles gives a smoother spectrum; a small value for 
+\begin_inset Quotes eld
+\end_inset
+
+resolution
+\begin_inset Quotes erd
+\end_inset
+
+ is needed to identify possible sharp spikes in the spectrum.
+\end_layout
+
+\begin_layout Itemize
+Additional smoothing can be provided for either type of spectrum by specifying
+ a value for the 
+\begin_inset Quotes eld
+\end_inset
+
+smoothBins
+\begin_inset Quotes erd
+\end_inset
+
+ argument.
+ The default is 0, and this value or any other value less than or equal
+ to 9 leads to no smoothing.
+ For other values, the spectrum is binned into 
+\begin_inset Quotes eld
+\end_inset
+
+smoothBins
+\begin_inset Quotes erd
+\end_inset
+
+ bins evenly spanning the displayed logarithmic frequency range and spectral
+ estimates are averaged within each bin before the plot is constructed.
+ Often a value of 50 or 100 is useful.
+\end_layout
+
+\begin_layout Itemize
+There is a faint orange background of lines in the generated plot that represent
+ a -5/3 logarithmic slope or, for the frequency-weighted spectrum, a -2/3
+ slope.
+ For measurements representing components of the wind (like WIC or VYC)
+ the reference lines are constructed so that there is a factor-of-10 difference
+ in eddy dissipation rate between the lines and the line representing 
+\begin_inset Formula $10^{-4}\mathrm{m^{2}s^{-3}}$
+\end_inset
+
+ is shown as a heavier dotted line.
+ This uses a default value of a parameter 
+\begin_inset Quotes eld
+\end_inset
+
+ae
+\begin_inset Quotes erd
+\end_inset
+
+ of 0.2.
+ This should be changed to ae=0.15 for a longitudinal spectrum like TASX
+ or UXC to shift the reference lines to account for the expected 4:3 ratio
+ between the expected magnitudes of the longitudinal and lateral spectra
+ in an inertial subrange.
+\end_layout
+
+\begin_layout Itemize
+An additional argument 
+\begin_inset Quotes eld
+\end_inset
+
+VLabel
+\begin_inset Quotes erd
+\end_inset
+
+ can be used to change to label used in the legend for the specified variable.
+ The default is the name of the supplied 
+\begin_inset Quotes eld
+\end_inset
+
+.Variable
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This can be useful to supply a more descriptive name than the short name
+ used in the netCDF file; for example 
+\begin_inset Quotes eld
+\end_inset
+
+VSpec (Data, 'UXC
+\begin_inset Quotes erd
+\end_inset
+
+, VLabel='longitudinal wind component [m/s]').
+\end_layout
+
+\begin_layout Itemize
+The final argument is 
+\begin_inset Quotes eld
+\end_inset
+
+ADD
+\begin_inset Quotes erd
+\end_inset
+
+ with default value NA.
+ If this argument is supplied, it should provide a variable containing a
+ previously defined ggplot2 specification of a plot, in which case the new
+ spectrum will be added to the existing plot.
+ This can be used to plot up to four variance spectra on a single plot.
+\end_layout
+
+\begin_layout Itemize
+The default ggplot2 theme is used unless you specify another.
+ I usually add 
+\begin_inset Quotes eld
+\end_inset
+
+theme_WAC()
+\begin_inset Quotes erd
+\end_inset
+
+ to the final plot specification before plotting to use the theme I prefer.
+\end_layout
+
+\begin_layout Standard
+Future modifications may add the capability to plot the spectrum generated
+ by 
+\begin_inset Quotes eld
+\end_inset
+
+bspec::bspec()
+\begin_inset Quotes erd
+\end_inset
+
+, which divided the spectra into segments and averages the spectra from
+ the segments in order to reduce the variance in the estimate, following
+ the method developed (I think) by Welch.
+ It would be desirable to add options to change the axis limits and y-axis
+ label as well, so this may be part of the eventual Ranadu function.
+ For this report, however, the version residing in the directory 
+\begin_inset Quotes eld
+\end_inset
+
+chunks
+\begin_inset Quotes erd
+\end_inset
+
+ and saved in the GitHub repository with this archive file was used.
+ For additional information on variance spectra and the R routines used,
+ see this tutorial: 
+\begin_inset CommandInset href
+LatexCommand href
+name "https://ncar-eol.shinyapps.io/VarSpec/"
+target "https://ncar-eol.shinyapps.io/VarSpec/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsubsection*
+MergeMatt()
+\end_layout
+
+\begin_layout Standard
+This function was used to combine the processed line-of-sight beam speeds
+ in Matt Hayman's processing into the standard netCDF file produced by normal
+ 
+\begin_inset Quotes eld
+\end_inset
+
+nimbus
+\begin_inset Quotes erd
+\end_inset
+
+ processing, optionally processed also by the Python script 
+\begin_inset Quotes eld
+\end_inset
+
+LAMS_ARISTO.py
+\begin_inset Quotes erd
+\end_inset
+
+ discussed below.
+ The reason for needing a special step (vs.
+\begin_inset space ~
+\end_inset
+
+normal data.frame merging) was that the 
+\begin_inset Quotes eld
+\end_inset
+
+Time
+\begin_inset Quotes erd
+\end_inset
+
+ variable in Matt's file was not the usual variable used in nimbus-produced
+ netCDF files because it lacked data information, so some additional processing
+ was needed to revise the time variable.
+ This function was only used once and the resulting merged data.frame was
+ saved for future use, so this is suppressed in the 
+\begin_inset Quotes eld
+\end_inset
+
+WindInSOCRATES.Rnw
+\begin_inset Quotes erd
+\end_inset
+
+ file by use of the 
+\begin_inset Quotes eld
+\end_inset
+
+eval=FALSE
+\begin_inset Quotes erd
+\end_inset
+
+ parameter in the 
+\begin_inset Quotes eld
+\end_inset
+
+merge
+\begin_inset Quotes erd
+\end_inset
+
+ program chunk.
+\end_layout
+
+\begin_layout Subsubsection*
+processWind()
+\end_layout
+
+\begin_layout Standard
+This function was used to calculate wind from the LAMS-provided beam speeds.
+ It used the variables 
+\begin_inset Quotes eld
+\end_inset
+
+V_LOS_Beam{1,2,3,4}
+\begin_inset Quotes erd
+\end_inset
+
+ produced by Matt Hayman, although it would optionally use the beam speeds
+ produced by the Python routine using Savitzgy-Golay polynomials.
+ As used, this function produced the wind vector in cartesian coordinates
+ from beams 1–3 and did not use beam 4, which was generally weak and questionabl
+e in this project and was not included in Matt Hayman's processing.
+ Once a relative-wind vector was determined from the LAMS beam speeds, that
+ vector was combined with the CMIGITS measurements of attitude angles and
+ Earth-relative aircraft motion to calculate the wind and return a data.frame
+ with variables representing the airspeed and wind components.
+\end_layout
+
+\begin_layout Subsubsection*
+AddWind(DF)
+\end_layout
+
+\begin_layout Standard
+This function implements the processing developed in this report by adding
+ new wind variables based on the pitot-static sensor and, separately, on
+ the gust pod.
+ There are several additional arguments that can control which variables
+ are added, but all are TRUE by default and so add all these results to
+ the supplied data.frame.
+ All of these rely on the Ranadu function 
+\begin_inset Quotes eld
+\end_inset
+
+WindProcessor()
+\begin_inset Quotes erd
+\end_inset
+
+.
+ The arguments to AddWind(), in addition to the data.frame, are:
+\end_layout
+
+\begin_layout Description
+addAKY: Add the angle of attack based on the complementary-filter algorithm
+ described in Section 1.2 of the report, with the name 
+\series bold
+AKY\SpecialChar endofsentence
+
+\series default
+ This option also adds a variable 
+\series bold
+WIY,
+\series default
+ the vertical wind calculated using the new angle-of-attack.
+\end_layout
+
+\begin_layout Description
+addGP: Add the wind measurements based on the gust pod, using the empirical
+ representation developed in this report.
+ The new variables are 
+\series bold
+AK_GP, SS_GP, TASG, WDG, WSG, WIG, UXG, VYG,
+\series default
+ representing respectiveley the angles of attack and sideslip, the airspeed,
+ the wind direction and speed, the vertical wind, and the longitudinal and
+ lateral components of the horizontal wind.
+\end_layout
+
+\begin_layout Description
+addTC: Add wind measurements and a new airspeed measurement based on measurement
+s from the pitot-static sensor.
+ New variables are 
+\series bold
+TASTC, WDTC, WSTC, WITC, UXTC, VYTC, 
+\series default
+with meanings analogous to the basic measurements with X or C suffixes in
+ place of TC.
+\end_layout
+
+\begin_layout Description
+addROC: Add a rate-of-climb variable 
+\series bold
+ROC 
+\series default
+representing the vertical speed of the aircraft as determined by integration
+ of the hydrostatic equation.
+\end_layout
+
+\begin_layout Standard
+In addition, it is possible to supply a 
+\begin_inset Quotes eld
+\end_inset
+
+Rate
+\begin_inset Quotes erd
+\end_inset
+
+ argument to handle the case where the data.frame does not have this attribute.
+ If this attribute is included in the data.frame, the 
+\begin_inset Quotes eld
+\end_inset
+
+Rate
+\begin_inset Quotes erd
+\end_inset
+
+ argument is overridden by the value of the attribute.
+\end_layout
+
+\begin_layout Standard
+This function is also used by the QAtools shiny app to support the addition
+ of these variables to a netCDF file.
+ The function itself does not do this; it only adds these variables to the
+ R data.frame.
+ The routine also makes use of SplitDV() so that function must be available
+ when it is called.
+ It also uses several Ranadu functions so that package should be available
+ when it is called.
+\end_layout
+
+\begin_layout Subsubsection*
+removeSpikes(v)
+\end_layout
+
+\begin_layout Standard
+To support the removal of spikes, this routine calculates the rolling mean
+ and standard deviation (width 99) of a variable 
+\begin_inset Quotes eld
+\end_inset
+
+v
+\begin_inset Quotes erd
+\end_inset
+
+, identifies values of the variable that differ from the rolling mean by
+ more standard deviations than a limit specified by sdLimit (default 4),
+ and replaces those values by interpolation in the returned variable.
+\end_layout
+
+\begin_layout Section*
+The Python routine LAMS_ARISTO.py
+\end_layout
+
+\begin_layout Standard
+This routine is replaced now by Matt Hayman's processing, especially now
+ that his variables include a measure of uncertainty, so this routine will
+ likely not be used in the future and it is not essential to the production
+ of the present report.
+ Nevertheless, the following provides some documentation in case it is ever
+ needed again, because for this work it had to be retrieved from a previous
+ version and modified, involving considerable work that might be reduced
+ by the following guide to how to use this routine:
+\end_layout
+
+\begin_layout Enumerate
+On tikal, copy the routine ~cooperw/ARISTO-2017/LAMS_ARISTO.py to another
+ directory where you have write permission.
+\end_layout
+
+\begin_layout Enumerate
+On lines 254 and 255, change the names of the data file and the directory
+ containing the file to be processed.
+ Do not include the trailing 
+\begin_inset Quotes eld
+\end_inset
+
+.nc
+\begin_inset Quotes erd
+\end_inset
+
+ in the file name.
+ Save the edited file.
+ CAUTION: This routine will create a new file in that same directory as
+ the existing file with 
+\begin_inset Quotes eld
+\end_inset
+
+LAMS
+\begin_inset Quotes erd
+\end_inset
+
+ appended to the file name, and if that file is present it will be overwritten.
+ This won't overwrite Matt's files because it adds 
+\begin_inset Quotes eld
+\end_inset
+
+LAMS
+\begin_inset Quotes erd
+\end_inset
+
+ instead of 
+\begin_inset Quotes eld
+\end_inset
+
+_LAMS
+\begin_inset Quotes erd
+\end_inset
+
+, but if his files ending in 
+\begin_inset Quotes eld
+\end_inset
+
+_LAMS
+\begin_inset Quotes erd
+\end_inset
+
+ are used the new file will end in 
+\begin_inset Quotes eld
+\end_inset
+
+_LAMSLAMS
+\begin_inset Quotes erd
+\end_inset
+
+.
+ In that case, the new file will contain the line-of-sight speeds obtained
+ by both algorithms, in Matt's case with the names Beam1_LAMS – Beam4_LAMS
+ and in the case of the Python program with names BEAM1speed – BEAM4speed.
+ Note, however, that these were not used in the present report except, when
+ present, for comparison tests.
+ Instead, Matt's variables 
+\begin_inset Quotes eld
+\end_inset
+
+V_LOS_Beamx
+\begin_inset Quotes erd
+\end_inset
+
+ (with x={1,2,3}) were be used.
+\end_layout
+
+\begin_layout Enumerate
+Run the program using the command 
+\begin_inset Quotes eld
+\end_inset
+
+python LAMS_ARISTO.py
+\begin_inset Quotes erd
+\end_inset
+
+.
+ There will be regular messages during processing, ending (if successful)
+ with the message 
+\begin_inset Quotes eld
+\end_inset
+
+Reached end of routine ...
+\begin_inset Quotes erd
+\end_inset
+
+.
+ This will typically take a few minutes, maybe as much as 5 min.
+ If this fails immediately, there may be a problem with the available python
+ packages that need updating or changing.
+ In particular, the 
+\begin_inset Quotes eld
+\end_inset
+
+netCDF4
+\begin_inset Quotes erd
+\end_inset
+
+ python package must be present.
+\end_layout
+
+\begin_layout Enumerate
+On successful completion, there should then be a new file with a name ending
+ in 
+\begin_inset Quotes eld
+\end_inset
+
+LAMS.nc
+\begin_inset Quotes erd
+\end_inset
+
+ in the prescribed working directory.
+ It should be slightly larger than the original file because a few variables
+ are added containing the line-of-sight LAMS speeds and some derived quantities.
+ These are then the netCDF files that were read by the next routine (the
+ processor associated with this document) to produce the final document,.
+\end_layout
+
+\begin_layout LyX-Code
+
+\end_layout
+
+\begin_layout Standard
+\align center
+
+\family sans
+\color blue
+– End of Memo –
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%
+\backslash
+attach{attachment}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+%
+\backslash
+attachm{first
+\backslash
+
+\backslash
+second}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status collapsed
+
+\begin_layout Plain Layout
+
+%
+\backslash
+cc{first attachment
+\backslash
+
+\backslash
+second
+\backslash
+
+\backslash
+3rd att}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
