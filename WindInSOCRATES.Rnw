@@ -2581,7 +2581,7 @@ SessionInfo}
 <<make-zip-archive, INCLUDE=TRUE, eval=FALSE>>=
 
 cat (toLatex(sessionInfo()), file="SessionInfo") 
-system (sprintf("zip WindInSOCRATES.zip WindInSOCRATES.Rnw WindInSOCRATES.pdf NoteReSOCRATESwindProcessing.pdf WorkflowWindInSOCRATES.pdf WAC.bib ./chunks/* SessionInfo"))
+system (sprintf("zip WindInSOCRATES.zip WindInSOCRATES.Rnw WindInSOCRATES.pdf NoteReSOCRATESwindProcessing.pdf WorkflowWindInSocrates.pdf WAC.bib ./chunks/* SessionInfo"))
 
 @ 
 
