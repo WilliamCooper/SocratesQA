@@ -952,6 +952,15 @@ v
 , identifies values of the variable that differ from the rolling mean by
  more standard deviations than a limit specified by sdLimit (default 4),
  and replaces those values by interpolation in the returned variable.
+ This may also be added to Ranadu, but the archived version in 
+\begin_inset Quotes eld
+\end_inset
+
+chunks
+\begin_inset Quotes erd
+\end_inset
+
+ is the specific one used in thie report.
 \end_layout
 
 \begin_layout Section*
