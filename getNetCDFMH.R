@@ -1,4 +1,4 @@
-
+## this is a special version to handle the Hatt Hayman files:
 #' @title getNetCDF
 #' @description Loads selected variables in a specified netCDF data file into a data.frame.
 #' @details 'Time' is converted to a POSIXct variable, and other variables specified in 

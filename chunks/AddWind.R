@@ -40,7 +40,8 @@ AddWind <- function (DF, Rate=1, addAKY=TRUE, addGP=TRUE, addTC=TRUE, addROC=TRU
     V <- 'QR'
     FV <- c(FV, V)
     D[, V] <- D$ADIFR / D$QCF
-    D$QR[is.infinite(D$QR)] <- NA
+    # D$QR[is.infinite(D$QR)] <- NA
+    D$QR[D$QCF < 5] <- NA
     V <- 'M'
     FV <- c(FV, V)
     D[, V] <- MachNumber (D$PSF, D$QCF)

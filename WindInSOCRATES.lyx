@@ -1,5 +1,5 @@
-#LyX 2.2 created this file. For more info see http://www.lyx.org/
-\lyxformat 508
+#LyX 2.3 created this file. For more info see http://www.lyx.org/
+\lyxformat 544
 \begin_document
 \begin_header
 \save_transient_properties true
@@ -26,6 +26,7 @@
      June\or July\or August\or September\or October\or November\or
      December\fi
      \space\number\year}
+\renewcommand{\datetoday}{11 February 2018}
 \newcommand{\RAFAlgorithmMemo}{\null \vskip-1.5truein
 {\raggedright \textsf{\textsc{\large \textcolor{blue}{Research Aviation Facility}}}}\par
 {\raggedright \textsf{\textsl{\textcolor{blue}{Algorithm Memorandum:}}}} \par \vskip6pt
@@ -64,6 +65,8 @@ knitr
 \font_osf false
 \font_sf_scale 100 100
 \font_tt_scale 100 100
+\use_microtype false
+\use_dash_ligatures false
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -93,6 +96,7 @@ knitr
 \suppress_date false
 \justification true
 \use_refstyle 0
+\use_minted 0
 \index Index
 \shortcut idx
 \color #008000
@@ -108,7 +112,10 @@ knitr
 \tocdepth 2
 \paragraph_separation skip
 \defskip medskip
-\quotes_language english
+\is_math_indent 0
+\math_numbering_side default
+\quotes_style english
+\dynamic_quotes 0
 \papercolumns 1
 \papersides 2
 \paperpagestyle fancy
@@ -301,6 +308,7 @@ The gust pod consists of a Rosemount 858 probe installed in an underwing
 LatexCommand href
 name "this URL"
 target "https://www.eol.ucar.edu/instruments/all-weather-wind-gust-pod"
+literal "false"
 
 \end_inset
 
@@ -330,7 +338,7 @@ e wind variables to an existing netCDF data file.
 \end_layout
 
 \begin_layout Standard
-This documents discusses some of the options for measuring wind in SOCRATES.
+This document discusses some of the options for measuring wind in SOCRATES.
  The NSF/NCAR GV has some new capabilities that might improve the measurements
  of wind, but they are not fully investigated and documented yet and in
  some cases the processing algorithms have not be developed.
@@ -468,6 +476,7 @@ Characterization of Uncertainty in Measurements of Wind from the NSF/NCAR
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Cooper2016ncartn"
+literal "true"
 
 \end_inset
 
@@ -476,6 +485,7 @@ key "Cooper2016ncartn"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "CooperEtAl2014"
+literal "true"
 
 \end_inset
 
@@ -485,6 +495,7 @@ key "CooperEtAl2014"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Cooper2017ncartn"
+literal "true"
 
 \end_inset
 
@@ -593,6 +604,7 @@ QAtools
 LatexCommand href
 name "this URL"
 target "https://drive.google.com/open?id=0B1kIUH45ca5AN3VXSnlMOHFWS28"
+literal "false"
 
 \end_inset
 
@@ -656,6 +668,7 @@ g for AKRD using a complementary-filter approach and developed appropriate
 LatexCommand href
 name "this URL"
 target "https://drive.google.com/open?id=0B1kIUH45ca5AaFg4Sk9UWDY5OFE"
+literal "false"
 
 \end_inset
 
@@ -683,6 +696,7 @@ this URL
 LatexCommand href
 name "at this URL"
 target "https://drive.google.com/open?id=0B1kIUH45ca5ALXktNklmdkl3bFU"
+literal "false"
 
 \end_inset
 
@@ -2413,6 +2427,7 @@ Sexpr{round(cffn,4)}
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Cooper2016ncartn"
+literal "true"
 
 \end_inset
 
@@ -2489,6 +2504,7 @@ Sexpr{round(summary(fs)$sigma, 3)}
 LatexCommand href
 name "here"
 target "https://drive.google.com/open?id=0B1kIUH45ca5ALXktNklmdkl3bFU"
+literal "false"
 
 \end_inset
 
@@ -2600,6 +2616,7 @@ Although there are many uses of the LAMS measurements, as described in previous
 LatexCommand href
 name "this URL"
 target "https://drive.google.com/open?id=0B1kIUH45ca5Aa29JbjJkel82NFU"
+literal "false"
 
 \end_inset
 
@@ -2793,6 +2810,7 @@ with components inbound along the longitudinal forward, lateral starboard,
 LatexCommand href
 name "LAMSprocessing4Bwind.pdf"
 target "https://drive.google.com/open?id=0B1kIUH45ca5AalZOWHlscnprbnc"
+literal "false"
 
 \end_inset
 
@@ -4088,6 +4106,7 @@ accuracy
 LatexCommand href
 name "this URL"
 target "https://www.eol.ucar.edu/system/files/inttransmitters.pdf"
+literal "false"
 
 \end_inset
 
@@ -5582,6 +5601,7 @@ Define a new reference frame, here called the g-frame.
 LatexCommand href
 name "Workflow Document for the Kalman Filter Technical Note"
 target "https://drive.google.com/open?id=1mB-nwvaAw113nr1_2RRtIODxDj7h9W5X"
+literal "false"
 
 \end_inset
 
@@ -6088,6 +6108,7 @@ Ranadu
 \begin_inset CommandInset href
 LatexCommand href
 target "https://github.com/WilliamCooper/Ranadu.git"
+literal "false"
 
 \end_inset
 
@@ -6100,6 +6121,7 @@ target "https://github.com/WilliamCooper/Ranadu.git"
 LatexCommand href
 name "workflow document"
 target "https://github.com/WilliamCooper/KalmanFilter/blob/master/WorkflowKalmanFilter.pdf"
+literal "false"
 
 \end_inset
 
@@ -6107,6 +6129,7 @@ target "https://github.com/WilliamCooper/KalmanFilter/blob/master/WorkflowKalman
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Cooper2017ncartn"
+literal "true"
 
 \end_inset
 
@@ -6733,6 +6756,7 @@ The standard method of calibrating the measurement of angle-of-attack is
 \begin_inset CommandInset citation
 LatexCommand cite
 key "Cooper2016ncartn"
+literal "true"
 
 \end_inset
 
@@ -8973,6 +8997,7 @@ Use the standard measurements from the radome, standard pitot tube, ambient
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Cooper2016ncartn"
+literal "true"
 
 \end_inset
 
@@ -10824,6 +10849,7 @@ The NCAR Technical Note TN-528+STR (
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Cooper2016ncartn"
+literal "true"
 
 \end_inset
 
@@ -11725,6 +11751,7 @@ rate of climb of the aircraft, using hydrostatic equation
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Cooper2017ncartn"
+literal "true"
 
 \end_inset
 
@@ -12325,6 +12352,7 @@ LaTeX
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Xie2014a"
+literal "true"
 
 \end_inset
 
@@ -12332,6 +12360,7 @@ key "Xie2014a"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Xie2014b"
+literal "true"
 
 \end_inset
 
@@ -12342,6 +12371,7 @@ key "Xie2014b"
 LatexCommand href
 name "this URL"
 target "https://github.com/WilliamCooper/SocratesQA.git"
+literal "false"
 
 \end_inset
 
@@ -12361,6 +12391,7 @@ chunks
 \begin_inset CommandInset citation
 LatexCommand citet
 key "Rlanguage"
+literal "true"
 
 \end_inset
 
@@ -12368,6 +12399,7 @@ key "Rlanguage"
 \begin_inset CommandInset citation
 LatexCommand citet
 key "RStudio2012"
+literal "true"
 
 \end_inset
 
@@ -12382,6 +12414,7 @@ A package named Ranadu, containing ancillary functions, is used extensively
 \begin_inset CommandInset href
 LatexCommand href
 target "https://github.com/WilliamCooper/Ranadu.git"
+literal "false"
 
 \end_inset
 
@@ -12401,6 +12434,7 @@ The original files containing the data as produced by the NCAR Earth Observing
 LatexCommand href
 name "this URL"
 target "http://www.unidata.ucar.edu/software/netcdf/"
+literal "false"
 
 \end_inset
 
@@ -12499,6 +12533,7 @@ Archive package:
 LatexCommand href
 name "WindInSOCRATES.zip"
 target "https://github.com/WilliamCooper/GustPod/blob/master/AddingGustPodSocrates.zip"
+literal "false"
 
 \end_inset
 
@@ -12562,6 +12597,7 @@ Program:
 LatexCommand href
 name "WindInSOCRATES.Rnw"
 target "https://github.com/WilliamCooper/GustPod/blob/master/WindInSOCRATES.Rnw"
+literal "false"
 
 \end_inset
 
@@ -12625,6 +12661,7 @@ Workflow Document:
 LatexCommand href
 name "WorkflowWindInSOCRATES.pdf"
 target "https://github.com/WilliamCooper/GustPod/blob/master/WorkflowWindInSOCRATES.pdf"
+literal "false"
 
 \end_inset
 
@@ -12660,6 +12697,7 @@ Git:
 LatexCommand href
 name "https://github.com/WilliamCooper/SocratesQA.git"
 target "https://github.com/WilliamCooper/SocratesQA.git"
+literal "false"
 
 \end_inset
 

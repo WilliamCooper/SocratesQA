@@ -1,0 +1,804 @@
+%% LyX 2.3.0 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{beamer}
+\usepackage{mathptmx}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\PassOptionsToPackage{normalem}{ulem}
+\usepackage{ulem}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Textclass specific LaTeX commands.
+% this default might be overridden by plain title style
+\newcommand\makebeamertitle{\frame{\maketitle}}%
+% (ERT) argument for the TOC
+\AtBeginDocument{%
+  \let\origtableofcontents=\tableofcontents
+  \def\tableofcontents{\@ifnextchar[{\origtableofcontents}{\gobbletableofcontents}}
+  \def\gobbletableofcontents#1{\origtableofcontents}
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% User specified LaTeX commands.
+\usetheme{WAC}
+\setbeamertemplate{headline}{}
+\setbeamertemplate{footline}[default]{}
+\setbeamertemplate{navigation symbols}{}
+%\setbeamercovered{transparent}
+%\setbeamercovered{opaque}
+\setbeamertemplate{enumerate subitem}{(\alph{enumii})}
+
+% or ...
+
+\setbeamercovered{transparent}
+% or whatever (possibly just delete it)
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+\setbeamercolor{normal text}{bg=yellow!10}
+
+
+\title{Overview of Wind Measurements at the RAF }
+
+\author{Al Cooper}
+
+\institute{NCAR}
+
+\institute{}
+
+\date[RAF 2018]{Presentation at the Wind and Turbulence Workshop}
+
+\makebeamertitle
+
+%\pgfdeclareimage[height=0.5cm]{institution-logo}{institution-logo-filename}
+%\logo{\pgfuseimage{institution-logo}}
+
+%\beamerdefaultoverlayspecification{<+->}
+\begin{frame}{Outline}
+
+\tableofcontents{}
+\end{frame}
+
+\section{Introduction}
+\begin{frame}{AVAILABLE WIND MEASUREMENTS}
+\begin{block}{Four Measuring Systems:}
+\begin{enumerate}
+\item The standard system:
+\begin{enumerate}
+\item radome + pitot tube and static ports for ``relative wind''
+\item GPS for aircraft motion (blended with INS via either a complementary
+filter or a Kalman filter)
+\end{enumerate}
+\item The Laser Air Motion System (discussed in the next two talks)
+\begin{enumerate}
+\item An independent measurement of the relative wind
+\item GPS coupled to a separate INS for LAMS-pod motion
+\end{enumerate}
+\item A revised standard system in which a new pitot-static tube replaces
+the standard pitot tube.
+\item The all-weather wind pod (underwing ``gust pod'') based on a Rosemount
+858 probe.
+\end{enumerate}
+\end{block}
+\end{frame}
+
+\begin{frame}{STANDARD SYSTEM: STATUS }
+
+\begin{itemize}
+\item Measurement uncertainty: 
+\begin{itemize}
+\item documented in NCAR Tech Note, 2016
+\item claimed uncertainty limits are <0.4~m/s (horizontal components) and
+<0.2~m/s (vertical)
+\item with Kalman filter corrections: about 0.1~m/s
+\end{itemize}
+\item However, problems remain:
+\begin{enumerate}
+\item Line resonance introduces serious noise for frequency above about
+2~Hz, GV.
+\item Sensor resolution (esp.~for QCF) contaminates the spectrum in conditions
+with low turbulence.
+\end{enumerate}
+\item The above two bullets are not contradictory because the fluctuations
+needed for the high-frequency components of the spectrum are small
+compared to the uncertainty limits.
+\end{itemize}
+\end{frame}
+
+
+\section{LAMS from ARISTO-2017}
+\begin{frame}{LAMS UPDATE}
+
+\begin{block}{Used for Determining the Static Defect:}
+\begin{description}
+\item [{q:}] Find adjustment needed so that $q$ produces an airspeed matching
+that measured by LAMS.
+\item [{ptot:}] Assume (with verification) that the sum of dynamic plus
+static pressure is correct.
+\item [{p:}] The same correction needed for $q$ then applies, with reverse
+sign, to $p$, determining the ``static defect''.
+\end{description}
+\end{block}
+\begin{alertblock}{Has the static defect changed since it was first determined (2012)?}
+\begin{itemize}
+\item LAMS was again flown in ARISTO 2017, in a 4-beam version (3+1/2 working)
+\item Better measurement of TAS than original, because there were 3 beams.
+\item \textbf{Critical test:} is the TAS determined by LAMS consistent with
+the reference TASX? If so, PCors are unchanged.
+\end{itemize}
+\end{alertblock}
+\end{frame}
+
+\begin{frame}{NEW PROCESSING SCHEME}
+\begin{enumerate}
+\item Two independent processing schemes:
+\begin{enumerate}
+\item Matt Hayman: Continued to improve the Spuler-Hayman scheme, and importantly
+added an estimate of uncertainty.
+\begin{enumerate}
+\item sensitivity significantly improved
+\item important to avoid questionable estimates because, for calibration,
+want to use only the subset of best measurements out of a large dataset.
+\end{enumerate}
+\item Cooper: Resurrected old Python program based on Savitzky-Golay polynomial
+smoothing, with signal-to-noise test to exclude questionable data.
+\begin{enumerate}
+\item compared very well to Matt's processing when both schemes indicated
+low uncertainty in the estimate.
+\item can now consider this obsolete.
+\end{enumerate}
+\end{enumerate}
+\item Used an R script to convert the along-beam speeds from the above processing
+to a relative-wind vector in the reference frame of the LAMS IRU.
+The magnitude of that relative-wind vector is then the airspeed.
+\end{enumerate}
+\end{frame}
+%
+\begin{frame}{RESULT: TASX vs TASL}
+
+\vskip-4.5cm
+\begin{exampleblock}{}
+\begin{center}
+\includegraphics[width=0.8\textwidth]{figure/SO-tasPlot-1}
+\par\end{center}
+
+\end{exampleblock}
+\vskip-8cm\hskip2cm\fcolorbox{black}{yellow!40}{%
+\begin{minipage}[t]{0.45\columnwidth}%
+\uline{regression fit:} \\
+~~TASX=-0.12+0.9994\,TASL\\
+~~rms 0.43~m/s%
+\end{minipage}}
+\end{frame}
+%
+\begin{frame}{SHOULD WE DO ANYTHING?}
+\begin{block}{Status}
+\begin{itemize}
+\item Indicated typical change is about 0.2~m/s.
+\item The PCor function could be adjusted via a new fit, to remove this
+offset.
+\item Nevertheless, it may be better to make no changes:
+\begin{itemize}
+\item The original fit for the GV spanned a larger range of altitude.
+\item The suggested adjustment is within the measurement uncertainty.
+\item Making no change would be consistent with the philosophy of using
+calibrations as checks rather than always updating to the latest calibration.
+\end{itemize}
+\end{itemize}
+\end{block}
+\begin{summaryblock}{Possible follow-up steps:}
+\begin{enumerate}
+\item Use TASL to find associated QCL.
+\item Fit to find QCL \textasciitilde{} QCF, ...
+\item Revise PCor function.
+\end{enumerate}
+\end{summaryblock}
+\end{frame}
+%
+<<initialization, include=FALSE>>=
+
+require(knitr)
+opts_chunk$set(fig.path='figure/SO-', echo=FALSE, include=FALSE, fig.lp="fig:", size='footnotesize', replace.assign=TRUE, width=49)
+opts_chunk$set(fig.width=6, fig.height=4.5, fig.align="center", digits=4)
+options(digits=5)
+thisFileName <- "WindInSOCRATES"
+require(Ranadu, quietly = TRUE, warn.conflicts=FALSE)
+require(ggplot2)
+require(grid)
+require(ggthemes)
+require(zoo)
+library(scales)
+refline <- function (vmin=-100, vmax=100) {
+  lines(c(vmin, vmax), c(vmin, vmax), col='darkorange', lwd=2, lty=2)
+}
+PCA <- TRUE
+load('DataM.Rdata')
+Theta <- c(35, 0, 35, 35) * pi / 180  ## need new values for ARISTO2017
+Phi <- c(180, 0, 60, -60) * pi / 180
+
+source('chunks/processWind.R')
+DW <- processWind (DataM)
+DataM$TASL <- DW$TASX3
+DataM$WDL <- DW$WDN
+DataM$WSL <- DW$WSN
+DataM$WIL <- DW$WIN
+DataM$VXG <- DW$VXG
+DataM$VYG <- DW$VYG
+DataM$VZG <- DW$VZG
+# DataM$V_LOS_Beam1 <- DW$V_LOS_Beam1  ## these values have interpolation,
+                                       ## so don't make this substitution
+uv <- c(cos(Theta), -sin(Theta)*sin(Phi), -sin(Theta)*cos(Phi))
+dim(uv) <- c(4,3)
+DataM$UXA <- with(DataM, TASX / sqrt(1 + tan(ATTACK*pi/180)^2 + tan(SSRD*pi/180)^2))
+RWA <- with(DataM, c(UXA, UXA*tan(ATTACK*pi/180), UXA*tan(SSRD*pi/180)))
+dim(RWA) <- c(nrow(DataM), 3)
+RWL <- XformLA(DataM, RWA)
+## make small adjustments to LAMS attitude angles, as indicated by LOS plots:
+# DataM$CPITCH_LAMS <- DataM$CPITCH_LAMS + 2
+# DataM$CTHDG_LAMS <- DataM$CTHDG_LAMS + 2
+DLAMS <- with(DataM, data.frame(Time, ROLL=CROLL_LAMS, PITCH=CPITCH_LAMS+2, THDG=CTHDG_LAMS+2))
+RWB <- XformLA(DLAMS, RWL, .inverse=TRUE)
+LOSV <- RWB %*% t(uv)
+DataM$BX1 <- LOSV[,1]
+DataM$BX2 <- LOSV[,2]
+DataM$BX3 <- LOSV[,3]
+DataM$BX4 <- LOSV[,4]
+# impose restrictions here
+DataR <- DataM[DataM$TASX > 90,]
+DataR <- DataR[abs(DataR$ROLL) < 3, ]
+DataR <- DataR[DataR$V_LOS_Beam2_Uncertainty > 0.001 & DataR$V_LOS_Beam2_Uncertainty < 0.1, ]
+
+# with(DataR, plotWAC(data.frame(TASL, TASX),xlab='TASX [m/s]', ylab='TASL [m/s]', type='p', pch=20, col='blue'))
+# lines(c(50,300), c(50,300), col='darkorange', lwd=3, lty=2)
+
+@
+\begin{frame}[fragile]{TASX DIFFERENCES}
+
+<<histTAS, include=TRUE, fig.cap=NULL>>=
+
+A <- with(DataR, binStats(data.frame(TASL-TASX, TASX), bins=20))
+g <- ggplot(data=A)+geom_errorbarh(aes(y=xc, xmin=ybar-sigma, xmax=ybar+sigma))+geom_point(aes(x=ybar, y=xc), colour='blue')+xlab('TASL-TASX [m/s]')+ylab('TASX [m/s]')+ylim(c(90,250))
+g <- g + geom_errorbarh(aes(y=xc, xmin=ybar-sigma/sqrt(nb), xmax=ybar+sigma/sqrt(nb)), colour='red')
+m <- with(DataR, mean(TASL-TASX, na.rm=TRUE))
+g <- g + ggtitle(sprintf ('mean TASL-TASX: %.2f m/s', m))
+g <- g + geom_path(data=data.frame(x=c(m,m), y=c(90,250)), aes(x=x, y=y), colour='blue') + theme_WAC() + theme (plot.title=element_text(size=14))
+print(g)
+
+@
+\end{frame}
+%
+
+\section{Pitot-Static Sensor}
+\begin{frame}{AVAILABLE MEASUREMENTS}
+\begin{block}{PSTF (static) and QCTF (dynamic):}
+
+Two approaches:
+\begin{enumerate}
+\item Find parameterized representations of PSTC/QCTC.
+\begin{enumerate}
+\item This is complicated because PSTF is seriously distorted from PSFC
+by airflow effects near the fuselage.
+\item Advantage: This can be independent of the standard measurements PSFC/QCFC.
+\end{enumerate}
+\item Use the total pressure PSTF+QCTF and subtract PSFC:
+
+~~~~~~~~~~~~~~~~QCTC=PSTF+QCTF-PSFC\\
+Advantage: uses carefully calibrated PSFC; \\
+~~~~~~~~~~~~~~~~no additional PCors needed
+\end{enumerate}
+\end{block}
+\end{frame}
+%
+\begin{frame}{FRIESEN-LENSCHOW FIT}
+\begin{exampleblock}{}
+
+With $q$ and $p$ the dynamic and static pressures from the pitot-static
+sensor, and with $\alpha$ and $\beta$ the respective angles of attack
+and sideslip,
+
+\[
+\frac{\delta p}{p}=a_{0}+a_{1}\frac{q}{p}+a_{2}\left(\frac{q}{p}\right)^{1/2}+a_{3}\left(\frac{q}{p}\right)^{3/2}+a_{4}\alpha+a_{5}\beta
+\]
+
+\end{exampleblock}
+\end{frame}
+%
+<<loadSocratesData, include=FALSE>>=
+
+Directory <- DataDirectory()
+Project <- 'SOCRATES'
+VL <- standardVariables(c('PSTF', 'QCTF', 'PSFC', 'QCXC', 'PSF', 'QCF', 'QCFC', 'ROLL'))
+Data <- data.frame()
+for (F in 1:7) {
+  D <- getNetCDF(sprintf('%s%s/%srf%02d.nc', Directory, Project, Project, F), VL)
+  D <- D[D$TASX > 70 & abs(D$ROLL) < 3, ]
+  D$RF <- F
+  ## eliminate some bad points at the start of rf06:
+  if (F == 6) {
+    D <- D[300:nrow(D), ]
+  }
+  Data <- rbind(Data, D)
+}
+for (F in 1:2) {
+  D <- getNetCDF(sprintf('%s%s/%stf%02d.nc', Directory, Project, Project, F), VL)
+  D <- D[D$TASX > 70 & abs(D$ROLL) < 3, ]       
+  D$RF <- F+50
+  Data <- rbind(Data, D)
+}
+for (F in 1:3) {       
+  D <- getNetCDF(sprintf('%s%s/%sff%02d.nc', Directory, Project, Project, F), VL)
+  D <- D[D$TASX > 70 & abs(D$ROLL) < 3, ]
+  D$RF <- F+70
+  Data <- rbind(Data, D)
+}
+
+@
+\begin{frame}[fragile]{COMPARISON OF TOTAL PRESSURES }
+
+\framesubtitle{nearly perfect}
+\begin{exampleblock}{Deming fit: offset 0.015 hPa; slope 1.000004; rms 0.14 hPa}
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{figure/SO-totalPressure-1}
+\par\end{center}
+
+\end{exampleblock}
+\end{frame}
+%
+
+<<RBFSHL, include=FALSE, echo=FALSE>>=
+
+pr <- with(DataR, QCTF/PSTF)
+a <- c(0.0271177, -0.0323388, -0.0328141, 0.335708, -0.00357207, 0.00128762)
+DP <- DataR$PSTF * (a[1] + a[2]*pr + a[3]*pr^0.5 + a[4]*pr^1.5 +a[5]*DataR$ATTACK + a[6] * DataR$SSLIP)
+DataR$QCTC <- DataR$PSTF+DataR$QCTF-DataR$PSFC
+DataR$PSTC2 <- DataR$PSTF - DP
+DataR$QCTC2 <- DataR$QCTF + DP
+DataR$TAST <- with(DataR, TrueAirspeed(MachNumber(PSFC, QCTC), ATX))
+
+DataR$TAST2 <- with(DataR, TrueAirspeed(MachNumber(PSTC2, QCTC2), ATX))
+
+m1 <- with(DataR, mean(TAST-TASX, na.rm=TRUE))
+sd1 <- with(DataR, sd(TAST-TASX, na.rm=TRUE))
+m2 <- with(DataR, mean(TAST2-TASX, na.rm=TRUE))
+sd2 <- with(DataR, sd(TAST2-TASX, na.rm=TRUE))
+
+@
+\begin{frame}[fragile]{COMPARISON OF THE TWO APPROACHES}
+
+\vskip-4cm
+
+<<histNewTAS, include=TRUE>>=
+
+with(DataR, hist(TAST-TASX, breaks=100, xlab='TAST-TASX [m/s]', xlim=c(-1,1), border='darkblue', col=rgb(0,0,1,0.3), freq=FALSE, main=NULL))
+with(DataR, hist(TAST2-TASX, breaks=100, border='forestgreen', col=rgb(0,1,0,0.3), freq=FALSE, add=TRUE))
+legend('topright', legend=c('PTOT-PSFC', 'empirical fit'), col=c('blue', 'forestgreen'), lwd=c(2,2))
+
+@
+
+\vskip-8.5cm\hskip1.5cm\fcolorbox{black}{yellow!40}{%
+\begin{minipage}[t]{0.7\columnwidth}%
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline 
+method & mean {[}m/s{]} & std dev {[}m/s{]}\tabularnewline
+\hline 
+\hline 
+empirical fit & 0.08 & 0.27\tabularnewline
+\hline 
+PTOT-PSFC & 0.03 & 0.12\tabularnewline
+\hline 
+\end{tabular}
+\par\end{center}%
+\end{minipage}}
+\end{frame}
+%
+<<high-rate-data, include=FALSE>>=
+
+VL <- c(VL, 'ATTACK', 'SSLIP')
+Data6e <- getNetCDF('/Data/SOCRATES/SOCRATESrf06h.nc', VL, 35000, 54000)
+pr <- with(Data6e, QCTF/PSTF)
+a <- c(0.0271177, -0.0323388, -0.0328141, 0.335708, -0.00357207, 0.00128762)
+DP <- Data6e$PSTF * (a[1] + a[2]*pr + a[3]*pr^0.5 + a[4]*pr^1.5 +a[5]*Data6e$ATTACK + a[6] * Data6e$SSLIP)
+Data6e$PSTFC <- Data6e$PSTF - DP
+Data6e$QCTFC <- Data6e$QCTF + DP
+Data6e$QCTC <- Data6e$PSTF+Data6e$QCTF-Data6e$PSFC
+Data6e$PSFCS <- rollapply(Data6e$PSFC, 50, mean, na.rm=TRUE, align='right', fill=NA)
+Data6e$QCTCS <- Data6e$PSTF+Data6e$QCTF-Data6e$PSFCS
+Data6 <- Data6e[setRange(Data6e, 40000, 53000),]
+Data6$RNORM <- rnorm(nrow(Data6), 0, 0.1)
+
+@
+\begin{frame}[fragile]{AMBIENT-PRESSURE MEASUREMENTS:}
+
+\framesubtitle{source: sensor precision}
+\begin{center}
+\includegraphics[width=0.85\textwidth]{figure/SO-plotSpec1-1}
+\par\end{center}
+
+\end{frame}
+%
+\begin{frame}[fragile]{PSFC AND 0.08 hPa NOISE:}
+
+<<plotSpec2, include=TRUE>>=
+
+g <- VSpec(Data6, 'PSFC', method='MEM')
+g <- VSpec (Data6, 'PSF', method='MEM', ADD=g)
+Data6$RNORM <- rnorm(nrow(Data6), 0, 0.08)
+g <- VSpec(Data6, 'RNORM', VLabel='0.08 Gaussian', method='MEM', ADD=g)
+# g <- VSpec(Data6, 'PSTF', method='MEM', ADD=g)
+# # g <- VSpec(Data6, 'QCF', method='MEM', ADD=g)
+# # g <- VSpec(Data6, 'QCTF', method='MEM', ADD=g)
+# g <- VSpec(Data6, 'PSTFC', method='MEM', ADD=g)
+print (g+theme_WAC())
+
+@
+\end{frame}
+%
+\begin{frame}[fragile]{ALLAN VARIANCE: VERY USEFUL TOOL}
+\begin{columns}
+%
+
+\column{5 cm}
+\begin{block}{Applied to PSFC:}
+\begin{itemize}
+\item Here, very low-turbulence
+\item Variance extrapolated to left side: random error
+\item Linear decrease: from averaging random error
+\item Around 1 s: onset of other errors or real signal.
+\item Suggestion: no useful information for f > 1 Hz.
+\end{itemize}
+\end{block}
+
+\column{7.5 cm}
+
+<<allanvar, include=FALSE>>=
+ 
+library(allanvar)
+p <- ts(Data6$PSFC, frequency=25)
+avp <- avar(p, 25)
+
+@
+
+<<allenvplot, include=TRUE>>=
+
+suppressMessages(print(ggplotWAC(data.frame(avp$time, avp$av), legend.position=NA)+xlab('cluster size [s]')+
+   ylab(expression(paste('Allan variance [hPa'^2,']', sep='')))+
+   scale_x_log10(breaks = trans_breaks("log10", function(x) 10^x, n=5),
+ labels = trans_format("log10", math_format(10^.x))) +
+ scale_y_log10(breaks = trans_breaks("log10", function(x) 10^x, n=3),
+ labels = trans_format("log10", math_format(10^.x))) +
+ annotation_logticks(sides='lb') +ggtitle('PSFC Allan-Variance Analysis')))
+
+@
+\end{columns}
+
+\end{frame}
+%
+\begin{frame}[fragile]{PSTF and PSTFC (Friesen-Lenschow variable)}
+\begin{columns}
+%
+
+\column{5 cm}
+\begin{block}{Peak Near 0.5 Hz: Dutch Roll:}
+\begin{itemize}
+\item Basic instability mode: coupled roll/yaw.
+\item Controlled by the yaw damper.
+\item Airflow distortion causes amplified effect in PSTF.
+\item Empirical correction function appears to introduce noise; PSTF itself
+looks very good.
+\end{itemize}
+\end{block}
+
+\column{7.5 cm}
+
+<<specPST, include=TRUE>>=
+
+g <- VSpec(Data6, 'PSTF', method='MEM')
+VSpec (Data6, 'PSTFC', method='MEM', ADD=g) + theme_WAC()
+
+@
+\end{columns}
+
+\end{frame}
+%
+\begin{frame}[fragile]{QC VARIABLES: KEY TO IMPROVED WIND}
+\begin{columns}
+%
+
+\column{5 cm}
+\begin{block}{Features:}
+\begin{itemize}
+\item Excess high-frequency variance in QCF/QCFC.
+\begin{itemize}
+\item contribution from spikes?
+\item resonance?
+\end{itemize}
+\item QCTF also shows possible noise, much lower level.
+\begin{itemize}
+\item not useful without correction.
+\item noise suggests complete correction may be impossible.
+\end{itemize}
+\item PTOT-PSFC shows noise likely from PSFC but gives right TAS.
+\item Suggested solution: filter or otherwise smooth PSFC
+\end{itemize}
+\end{block}
+
+\column{7.5 cm}
+
+<<specQCT, include=TRUE>>=
+
+g <- VSpec(Data6, 'QCFC', method='MEM')
+g <- VSpec (Data6, 'QCTF', method='MEM', ADD=g)
+g <- VSpec (Data6, 'QCTC', VLabel='PTOT-PSFC', method='MEM', ADD=g)
+print (g + theme_WAC())
+
+@
+\end{columns}
+
+\end{frame}
+%
+\begin{frame}{CONTROLLING THE PSFC VARIANCE}
+\begin{block}{Three Smoothing options}
+\begin{enumerate}
+\item Butterworth filter, centered, 1-s time constart.
+\begin{enumerate}
+\item Should be best option
+\item Can't be implemented in recursive processor
+\end{enumerate}
+\item Butterworth filter, one-sided, 1-s time constant
+\begin{enumerate}
+\item Likely to be almost as good
+\item possible in recursive processor like nimbus
+\end{enumerate}
+\item Running average of last 50 values
+\begin{enumerate}
+\item Simplest to implement: e.g., circular-buffer technique
+\item Doesn't requre any new filter coefficients.
+\end{enumerate}
+\end{enumerate}
+\end{block}
+\end{frame}
+%
+%
+\begin{frame}[fragile]{ALL PRODUCE ESSENTIALLY IDENTICAL RESULTS}
+
+<<smoothingPSFC, include=TRUE>>=
+
+# Data6e$PSFC <- removeSpikes (Data6e$PSFC, sdLimit=4)
+# Data6e$QCTF <- removeSpikes (Data6e$QCTF, sdLimit=4)
+# Data6e$TASX <- removeSpikes (Data6e$TASX, sdLimit=4)
+Data6e$PSFCFC <- signal::filtfilt (signal::butter (3, 2/(25), type='low'), Data6e$PSFC)
+Data6e$PSFCFR <- signal::filter (signal::butter (3, 2/(25), type='low'), Data6e$PSFC)
+Data6e$PSFCRA <- rollapply(Data6e$PSFC, 25, mean, na.rm=TRUE, align='right', fill=NA)
+Data6e$QCTC1 <- with(Data6e, PSTF+QCTF-PSFCFC)
+Data6e$QCTC2 <- with(Data6e, PSTF+QCTF-PSFCFR)
+Data6e$QCTC3 <- with(Data6e, PSTF+QCTF-PSFCRA)
+Data6a <- Data6e[setRange(Data6e, 50000, 53000),]
+# Data6e$PSTFC <- removeSpikes (Data6e$PSTFC, sdLimit=4)
+# Data6e$QCTFC <- removeSpikes (Data6e$QCTFC, sdLimit=4)
+g <- VSpec(Data6a, 'QCTC1', VLabel='butter centered', method='MEM')
+g <- VSpec(Data6a, 'QCTC2', VLabel='butter recursive', method='MEM', ADD=g)
+g <- VSpec(Data6a, 'QCTC3', VLabel='running average', method='MEM', ADD=g)
+print (g+theme_WAC())
+
+@
+\end{frame}
+%
+\begin{frame}[fragile]{COMPARISON OF AVAILABLE QCs, USED FOR TAS}
+
+\framesubtitle{with aggressive spike removal}
+
+<<TAScomparison, include=TRUE>>=
+
+Data6e$TASTC <- with(Data6e, TrueAirspeed (MachNumber(PSFCFC, QCTC1), ATX))
+Data6e$TASTFC <- with(Data6e, TrueAirspeed (MachNumber (PSTFC, QCTFC), ATX))
+Data6e$TASX <- removeSpikes(Data6e$TASX, sdLimit=3)
+Data6e$TASTC <- removeSpikes(Data6e$TASTC, sdLimit=3)
+Data6e$TASTFC <- removeSpikes(Data6e$TASTFC, sdLimit=3)
+Data6a <- Data6e[setRange(Data6e, 50000, 53000),]
+g <- VSpec (Data6a, 'TASX', VLabel='standard', method='MEM')
+g <- VSpec (Data6a, 'TASTFC', VLabel='empirical fit', method='MEM', ADD=g)
+g <- VSpec (Data6a, 'TASTC', VLabel='PTOT-PSFCS', method='MEM', ADD=g)
+print (g + theme_WAC())
+
+@
+\end{frame}
+%
+\begin{frame}{SUMMARY: PITOT-STATIC SENSOR}
+\begin{summaryblock}{Tentative Recommendation:}
+\begin{enumerate}
+\item For QC, use PTOT-PSXC
+\begin{enumerate}
+\item 1-Hz averages are adequate at standard rate
+\item For high rate, use a 1-s moving average for PSXC.
+\end{enumerate}
+\item Use this new QC for TASX and wind:
+\begin{enumerate}
+\item Variance spectra are improved at high rate.
+\item Mean measurements match our best values.
+\end{enumerate}
+\end{enumerate}
+\end{summaryblock}
+\begin{alertblock}{However, spikes introduce serious problems}
+\begin{enumerate}
+\item Spike-removal algorithm helps
+\item Remaining worry about spikes below the algorithm threshold
+\item Latest CJW processing does not resolve the problem.
+\end{enumerate}
+\end{alertblock}
+\end{frame}
+%
+\begin{frame}{WORK-AROUND}
+\begin{block}{Reprocess using sample-rate data}
+
+Sample-rate file has all derived variables, including wind, at 1 Hz
+\begin{enumerate}
+\item Must recalculate all derived variables: PSFC, QCFC, WIC, etc.
+\item Use interpolation where values are missing:
+\begin{itemize}
+\item required for the spectral-analysis calculation
+\end{itemize}
+\item Can use new algorithms for AKRD, ROC, and TASTC
+\end{enumerate}
+\end{block}
+\end{frame}
+%
+<<highTurbData, include=FALSE>>=
+
+Directory <- DataDirectory ()			
+VarList <- c("ADIFR", "GGVSPD", "PITCH", "QCF", "PSF", "AKRD", "WIC", "TASF", "GGALT", "ROLL", "PSXC", "ATX", "QCXC")
+## add variables needed to recalculate wind
+VarList <- c(VarList, "TASX", "ATTACK", "SSLIP", "GGVEW", "GGVNS", "VEW", "VNS", "THDG")
+Flight <- "rf01_hr"
+Flight <- "rf08h" 
+Rate <- 25
+Project <- "SOCRATES"
+VL <- standardVariables(c('PSTF', 'QCTF', 'PSFC', 'QCXC', 'PSF', 'QCF', 'QCFC', 'ROLL'))
+VarNames <- c("VYC","GGALT","LATC", "LONC", "PSXC", "QCXC",
+              "WDC", "WSC", "GGVEW", "GGVNS", "VEW", "VNS",
+              "QCTF", "PSTF",
+              "ADIFR", "ATTACK", "SSLIP", "PITCH", "TASX",
+              "ROLL", "THDG", "BDIFR", "GGVSPD", 'EWX',
+              "ADIF_GP", "BDIF_GP", "PS_GP", "QC_GP",
+              "CROLL_GP", "CPITCH_GP", "CTHDG_GP", "WIC",
+              "CVNS_GP", "CVEW_GP", "VSPD", "CVSPD_GP",
+              "ATX", 'SSRD', 'AKRD', 'QCF', 'PSF')
+VarList <- unique (c(VarList, VL, VarNames, 'UXC', 'VYC'))
+source('~/RStudio/Ranadu/R/getNetCDF.R')
+VarList <- unique(c(VarList, c('ACINS', 'LATC', 'GGALT')))
+DSRT8 <- getNetCDF('/Data/SOCRATES/SOCRATESrf08srt.nc', VarList, 45000, 51000)
+## repeat calculations needed to get all variables to 50 Hz:
+## AKRD/ATTACK, WIC, TASF/TASX, PSXC/PSFC, QCXC/QCFC, ATX, SSLIP, DPXC, EWX, LATC, LONC, MACHX, MR, PALT, WDC, WSC, VYC, UXC
+D <- DSRT8    ## (for simplicity in typing)
+D$QR <- D$ADIFR / D$QCF
+D$QR[D$QCF < 20] <- NA
+D$QR[is.infinite(D$QR)] <- NA
+D$M <- MachNumber (D$PSF, D$QCF)
+D$WICS <- SmoothInterp (D$WIC)
+CutoffPeriod <- 600 * Rate
+D$QRS <- zoo::na.approx (as.vector(D$QR), maxgap=1000*Rate, na.rm = FALSE)
+D$QRS[is.na(D$QRS)] <- 0
+D$QRS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QRS)
+D$QRF <-  D$QR - D$QRS
+D$QCFS <- zoo::na.approx (as.vector(D$QCF), maxgap=1000*Rate, na.rm = FALSE)
+D$QCFS[is.na(D$QCFS)] <- 0
+D$QCFS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$QCFS)
+D$MS <- zoo::na.approx (as.vector(D$M), maxgap=1000*Rate, na.rm = FALSE)
+D$MS[is.na(D$MS)] <- 0
+D$MS <- signal::filtfilt (signal::butter (3, 2/CutoffPeriod), D$MS)
+D$MF <-  D$M - D$MS
+DSRT8 <- D
+rm('D')
+load (file='AKRD-fit-coef.Rdata')
+DSRT8$AK <- cff * DSRT8$QRF + cfs[1] + cfs[2] * DSRT8$QRS + cfs[3] * DSRT8$QCFS
+DSRT8$ATTACK <- DSRT8$AK
+DSRT8$PSFC <- DSRT8$PSF * (1 + with(DSRT8, PCorFunction (PSF, QCF, AK)))
+DSRT8$PSXC <- DSRT8$PSFC
+DSRT8$QCFC <- DSRT8$QCF - DSRT8$PSF * (with(DSRT8, PCorFunction (PSF, QCF, AK)))
+DSRT8$QCXC <- DSRT8$QCFC
+DSRT8$TASF <- with(DSRT8, TrueAirspeed(MachNumber (PSFC, QCFC), ATX))
+DSRT8$TASX <- DSRT8$TASF
+DSRT8$SSRD <- -0.008 + 22.302 * (DSRT8$BDIFR / DSRT8$QCF)
+DSRT8$SSLIP <- DSRT8$SSRD
+DSRT8$MACHX <- MachNumber(DSRT8$PSXC, DSRT8$QCXC)
+DSRT8$ATTACK <- DSRT8$AK
+for (V in c('PSFC', 'QCFC', 'ATX', 'ATTACK', 'SSLIP')) {
+  DSRT8[, V] <- zoo::na.approx (as.vector(DSRT8[, V]), maxgap=1000*Rate, na.rm = FALSE)
+}
+DSRT8$PSFCFC <- signal::filtfilt (signal::butter (3, 2/(25*Rate), type='low'), DSRT8$PSFC)
+DSRT8$PSFCFR <- signal::filter (signal::butter (3, 2/(25*Rate), type='low'), DSRT8$PSFC)
+DSRT8$PSFCRA <- rollapply(DSRT8$PSFC, 50, mean, na.rm=TRUE, align='right', fill=NA)
+DSRT8$QCTC1 <- with(DSRT8, PSTF+QCTF-PSFCFC)
+DSRT8$QCTC2 <- with(DSRT8, PSTF+QCTF-PSFCFR)
+DSRT8$QCTC3 <- with(DSRT8, PSTF+QCTF-PSFCRA)
+DSRT8$TASTC <- with(DSRT8, TrueAirspeed(MachNumber(PSFCFC, QCTC1), ATX))
+DSRT8$Grav <- Gravity(DSRT8$LATC, DSRT8$GGALT)
+Data <- DSRT8
+source ('~/RStudio/KalmanFilter/chunks/ROC.R')
+DataW <- DSRT8
+# DataW$GGVSPD <- Data$ROC
+DataW <- WindProcessor (DataW)
+DSRT8$WSC <- DataW$WSN
+DSRT8$WDC <- DataW$WDN
+DSRT8$WIC <- DataW$WIN
+Cradeg <- pi/180
+hdg <- DSRT8$THDG * Cradeg 
+wd <- DSRT8$WDC * Cradeg + pi 
+DSRT8$UXC <- DSRT8$WSC * (sin(hdg) * sin(wd) + cos(hdg) * cos(wd)) 
+hdg <- hdg - pi/2 
+DSRT8$VYC <- DSRT8$WSC * (sin(hdg) * sin(wd) + cos(hdg) * cos(wd))
+DataW <- DSRT8
+DataW$TASX <- DSRT8$TASTC
+DataW <- WindProcessor (DataW)
+DSRT8$WITC <- DataW$WIN
+DSRT8$WDTC <- DataW$WDN
+DSRT8$WSTC <- DataW$WSN
+hdg <- DSRT8$THDG * Cradeg 
+wd <- DSRT8$WDTC * Cradeg + pi 
+DSRT8$UXTC <- DSRT8$WSTC * (sin(hdg) * sin(wd) + cos(hdg) * cos(wd)) 
+hdg <- hdg - pi/2 
+DSRT8$VYTC <- DSRT8$WSTC * (sin(hdg) * sin(wd) + cos(hdg) * cos(wd))
+D <- DSRT8[setRange(DSRT8, 45600, 50100),]
+
+@
+\begin{frame}[fragile]{VARIANCE SPECTRA FOR STRONG TURBULENCE}
+
+<<plotHTurb, include=TRUE>>=
+
+D$UXTCA <- D$UXTC * sqrt(4/3)
+g <- VSpec(D, 'WIC', method='MEM', xlim=c(0.01,25), ylim=c(0.001,1))
+g <- VSpec(D, 'VYTC', VLabel='VYT', method='MEM', ADD=g)
+VSpec(D, 'UXTCA', VLabel='UXTC adjusted', method='MEM', ADD=g) + theme_WAC()
+
+@
+\end{frame}
+%
+\begin{frame}{FURTHER IMPROVEMENT IS NEEDED}
+\begin{summaryblock}{}
+\begin{itemize}
+\item Longitudinal spectrum is improved, but still shows too much high-frequency
+variance.
+\item Lateral spectra look reasonable, but with some offset (VY higher):
+sideslip calibration?
+\item Ideas for next steps?
+\begin{itemize}
+\item high-rate LAMS (but sensitivity problems)
+\item gust pod when large pods not present: merged output with radome
+\item better pressure sensors?
+\item different PTOT sensor (measure directly?)
+\end{itemize}
+\end{itemize}
+\end{summaryblock}
+\end{frame}
+
+\section{The Gust Pod}
+\begin{frame}{CONFIGURATION OF THE GUST POD}
+\begin{block}{Potential Interference from the Large Pod}
+\begin{itemize}
+\item Previous use in DEEPWAVE looked encouraging for the gust pod, but
+the large pod was not present.
+\item The previously developed algorithms from DEEPWAVE do not work well
+for SOCRATES.
+\item Developed similar new algorithms, with mixed success:
+\begin{itemize}
+\item needed complicated transformations between reference frames
+\item did not produce good results for WI spectra
+\item requires 2nd-pass processing
+\end{itemize}
+\item Does not appear worth routine processing.
+\end{itemize}
+\end{block}
+\end{frame}
+%
+
+\end{document}
